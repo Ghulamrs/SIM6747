@@ -216,7 +216,10 @@ static bool decodeWord(uint32_t word, unsigned bits, const Header &h, Insn &in) 
                     o.offset = v; memOff = true;
                     if (bits == 16) {
                         o.mode = static_cast<uint8_t>(kmode(op.flags)); memMode = true;
-                        o.scaled = !(enc.coding == C_mem_offset_noscale || enc.coding == C_mem_offset_minus_one_noscale);
+                        // The compact LDNDW/STNDW's post-increment and pre-decrement (Dincdw, Ddecdw) step by doublewords,
+                        // as the 32-bit form's *R++[n] does: cl6x 8.2.2's fill loops store with STNDW *B6++[1] and
+                        // need it 8 bytes on. Only their offsets (Doff4dw, Dinddw) stay unscaled.
+                        o.scaled = enc.coding != C_mem_offset_noscale;
                         memScaled = true;
                         if (op.flags & K_B15PTR) { o.base = sideBase + 15; memBase = true; }
                     }
