@@ -61,6 +61,11 @@
     <ClCompile Include="src\C6xDecode.cpp" />
     <ClCompile Include="src\C6xImage.cpp" />
     <ClCompile Include="src\C6xDis.cpp" />
+    <ClCompile Include="src\C6xMem.cpp" />
+    <ClCompile Include="src\C6xCpu.cpp" />
+    <ClCompile Include="src\C6xExec.cpp" />
+    <ClCompile Include="src\C6xLoop.cpp" />
+    <ClCompile Include="src\C6xHost.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

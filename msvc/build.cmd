@@ -11,5 +11,5 @@ if not exist "%OBJ%" mkdir "%OBJ%"
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" >nul
 if errorlevel 1 exit /b 1
 cd /d "%ROOT%"
-cl -nologo -std:c++14 -O2 -W4 -WX -EHsc -D_CRT_SECURE_NO_WARNINGS -Fo"%OBJ%\\" -Fe"%ROOT%\vm6747.exe" src\Asm.cpp src\Cpu.cpp src\Isa.cpp src\Runtime.cpp src\main.cpp src\C6xIsa.cpp src\C6xDecode.cpp src\C6xImage.cpp src\C6xDis.cpp
+cl -nologo -std:c++14 -O2 -W4 -WX -EHsc -D_CRT_SECURE_NO_WARNINGS -Fo"%OBJ%\\" -Fe"%ROOT%\vm6747.exe" src\Asm.cpp src\Cpu.cpp src\Isa.cpp src\Runtime.cpp src\main.cpp src\C6xIsa.cpp src\C6xDecode.cpp src\C6xImage.cpp src\C6xDis.cpp src\C6xMem.cpp src\C6xCpu.cpp src\C6xExec.cpp src\C6xLoop.cpp src\C6xHost.cpp
 exit /b %errorlevel%

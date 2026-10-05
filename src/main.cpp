@@ -4,6 +4,7 @@
 
 #include "Asm.h"
 #include "C6xDis.h"
+#include "C6xHost.h"
 #include "Cpu.h"
 #include "Runtime.h"
 
@@ -72,6 +73,7 @@ int main(int argc, char **argv) {
 #endif
     if (argc > 1 && (std::strcmp(argv[1], "--dis") == 0 || std::strcmp(argv[1], "--dis-words") == 0))
         return c6x::disMain(argc - 1, argv + 1);
+    if (argc > 1 && std::strcmp(argv[1], "--run") == 0) return c6x::runMain(argc - 1, argv + 1);
     std::vector<std::string> files, args;
     bool trace = false;
     bool counts = false;
