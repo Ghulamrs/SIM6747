@@ -142,7 +142,7 @@ uint32_t Cpu6x::effectiveAddress(const Exec &x, const Operand &o, uint32_t &newB
     }
     auto add = [&](uint32_t b, uint32_t d, bool minus) -> uint32_t {
         uint32_t v = minus ? b - d : b + d;
-        if (block == 0 || block == 0) return v;
+        if (block == 0) return v;
         return (b & ~(block - 1)) | (v & (block - 1));
     };
     updates = false;
