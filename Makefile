@@ -19,7 +19,7 @@ CXXFLAGS = -std=c++14 -O2 -g -Wall -Wextra -Werror -pedantic
 # name at the space before anything can test it, so requiring both the prefix
 # and the suffix drops both halves and keeps every real source.
 SRCS     = $(filter src/%.cpp,$(wildcard src/*.cpp))
-OBJDIR  ?= ../build/Emulator/obj
+OBJDIR  ?= build/obj
 OBJS     = $(patsubst src/%.cpp,$(OBJDIR)/%.o,$(SRCS))
 # BINDIR: where the finished program goes - here by default, and the one
 # directory RStudio's workspace.mk names for everything it drives.

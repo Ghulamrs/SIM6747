@@ -3,3 +3,5 @@ vm6747.exe
 *.d
 tests/out-*/
 .DS_Store
+build/
+oracle/results/
