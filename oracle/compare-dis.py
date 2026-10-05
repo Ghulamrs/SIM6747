@@ -22,15 +22,43 @@ def num(tok):
     return str(-v if neg else v)
 
 
+SIZE = {'B': 1, 'H': 2, 'W': 4, 'DW': 8}
+
+
+def access_size(mn):
+    m = re.match(r'^(?:LD|ST)N?(DW|BU|HU|B|H|W)$', mn)
+    return SIZE.get(m.group(1).rstrip('U'), 1) if m else 1
+
+
 def norm(text):
     t = text.split(';')[0].strip()
     par = t.startswith('||')
-    t = t.lstrip('|').strip()
+    t = t.lstrip('|').strip().lstrip('^').strip()       # dis6x marks an SPMASKed instruction ||^
     t = re.sub(r'\s+', ' ', t).upper()
     t = re.sub(r'\s*([,:()\[\]])\s*', r'\1', t)
     t = re.sub(r'\s*\.\s*', '.', t)                    # "ADD .L1" and "ADD.L1"
+    # a branch target as dis6x writes it: $C$L25 (PC+160 = 0x80001234) is the address
+    t = re.sub(r'[^\s,]*\s*\(PC[+-]\d+\s*=\s*(0X[0-9A-F]+)\)', r'\1', t)
     t = NUM.sub(lambda m: num(m.group(1)), t)
     t = t.replace('[ ', '[').replace(' ]', ']')
+    head, _, ops = t.partition(' ')
+    mn = re.sub(r'^\[!?[AB]\d+\]', '', head).split('.')[0]
+    # memory operands in one form: *R is *+R(0), *R[n] is *+R[n], and a scaled constant offset is in bytes
+    size = access_size(mn)
+    ops = re.sub(r'\*([AB]\d+)(?=[,\s]|$)', r'*+\1(0)', ops)
+    ops = re.sub(r'\*([AB]\d+)\[', r'*+\1[', ops)
+    ops = re.sub(r'(\*[-+]{1,2}[AB]\d+|\*[AB]\d+[-+]{2})\[(\d+)\]', lambda m: '%s(%d)' % (m.group(1), int(m.group(2)) * size), ops)
+    # the assembler's aliases, which dis6x prints and the table does not: MV is ADD/OR with 0, ZERO is SUB x,x,x
+    o = ops.split(',')
+    cond = head[:len(head) - len(head.lstrip('[!AB0123456789]'))] if head.startswith('[') else ''
+    unit = head.split('.', 1)[1] if '.' in head else ''
+    if mn in ('ADD', 'OR') and len(o) == 3 and '0' in o[:2]:
+        mn, o = 'MV', [o[1] if o[0] == '0' else o[0], o[2]]
+    elif mn == 'SUB' and len(o) == 3 and o[0] == o[1] == o[2]:
+        mn, o = 'ZERO', [o[2]]
+    elif mn == 'MVK' and len(o) == 2 and o[0] == '0':
+        mn, o = 'ZERO', [o[1]]
+    t = cond + mn + ('.' + unit if unit else '') + (' ' + ','.join(o) if ops else '')
     return par, t
 
 
