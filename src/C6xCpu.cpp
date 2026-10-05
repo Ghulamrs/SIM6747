@@ -264,6 +264,9 @@ void Cpu6x::issue(const std::vector<const Insn *> &packet, uint32_t packetPc, ui
             const OperandInfo &oi = op.op[k];
             if (oi.rw != RW_r && oi.rw != RW_rw) continue;
             if (op.flags & K_STORE) continue;          // a store's data: read in E1 by its memory operation
+            // A memory operand's E3 is when memory is read, not its registers: the base and offset are read in E1,
+            // and a pre/post-increment lands at the end of E1 (SPRUFE8 4.2.3). The access itself waits as a MemOp.
+            if (oi.form == O_mem_short || oi.form == O_mem_ndw || oi.form == O_mem_long || oi.form == O_mem_deref) continue;
             last = std::max<unsigned>(last, std::max(oi.lowFirst, oi.highFirst));
         }
         Exec x; x.in = in; x.issue = c; x.at = c + last - 1; x.packetPc = packetPc; x.nextPc = nextPc; x.fromBuffer = fromBuffer;
