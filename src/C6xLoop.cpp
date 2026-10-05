@@ -43,10 +43,21 @@ void Cpu6x::loopStart(const Insn &in) {
     }
 }
 
+// The buffer goes idle with program memory still held by a multi-cycle NOP - BNOP's n, say, issued in the epilog.
+// The cycles it has left run out here, unless its branch lands first: then the target is the next packet, and the
+// packet after the BNOP never issues.
 void Cpu6x::loopIdle() {
     int left = lp_.progLeft;
     lp_ = Loop();
-    for (int k = 0; k < left; k++) cycleEnd();
+    for (int k = 0; k < left; k++) {
+        cycleEnd();
+        bool landed = false;
+        for (size_t i = 0; i < branches_.size(); ) {
+            if (branches_[i].at < cycle_) { pc_ = branches_[i].target; landed = true; branches_.erase(branches_.begin() + long(i)); }
+            else i++;
+        }
+        if (landed) break;
+    }
 }
 
 bool Cpu6x::loopBoundary() {
