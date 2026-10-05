@@ -42,8 +42,19 @@ D1, D2 and D3 are fixed and on `master`. D4, D5 and D6 were fixed on 2026-10-06,
 - D4 `dbee128` - the compact SPKERNEL's fstg/fcyc bit order (`tests/c6x-uspk.sh`).
 
 All 49 images now run to `C$$EXIT` with the oracle's output (checked against `oracle/ship/res`, not re-run on the
-boxes); vm6747sim/`cycle.CPU` stays 0.94-1.00. Still to do: re-run on the Linux and Windows boxes, and confirm the
-Uspk bit order against `dis6x`.
+boxes); vm6747sim/`cycle.CPU` stays 0.94-1.00. **Re-run on both boxes on 2026-10-06: 49 of 49 on each.** `dis6x` agrees on all 851
+SPKERNELs in the cl6x images, 150 of them with a non-zero fstg. Every fcyc in them is 0, so the fcyc bit order is unconfirmed.
+
+7. **D7 (new, 2026-10-06): a write conflict that is not one, in code from CCS 7.4's cl6x 8.2.2.**
+   `matmul.822-O2.out` stops at cycle 7251: "two results land in B16 in one cycle (SPRUFE8 3.8.8): from 0x80003b80 and
+   0x80003b82 ($C$L5+2)". TI's C6747 simulator runs the same image to `C$$EXIT`. The two addresses are 2 bytes apart, so
+   look at compact (16-bit) instructions and their latencies near `$C$L5`.
+8. **D8 (new, 2026-10-06): a silent wrong answer in code from cl6x 8.2.2.** `fill-stores.822-O2.out` runs to `C$$EXIT`, and
+   its first 64 lines match TI's. From line 65 (the fill of 16 elements) the checksums differ: `16 0: 2115383778 2190` against
+   TI's `16 0: 1872870048 2190`. That is 160 differing lines in all.
+
+Both images, the other cl6x 8.2.2 builds and CCS 5.5's results for them are in `oracle/ship/img822/`, which git ignores. The
+other 30 programs built by cl6x 8.2.2 match TI's simulator byte for byte; see `docs/TEST-2026-10-06.md`. D7 and D8 are open.
 
 The review's scratch patches for D1–D3 are described at the end of its section 4. They got
 32 of 49 images running to `C$$EXIT` with correct output.
