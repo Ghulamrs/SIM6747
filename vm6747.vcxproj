@@ -57,6 +57,10 @@
     <ClCompile Include="src\Isa.cpp" />
     <ClCompile Include="src\Runtime.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\C6xIsa.cpp" />
+    <ClCompile Include="src\C6xDecode.cpp" />
+    <ClCompile Include="src\C6xImage.cpp" />
+    <ClCompile Include="src\C6xDis.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

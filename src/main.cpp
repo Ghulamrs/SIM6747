@@ -3,6 +3,7 @@
 // The files are assembled together, the C library is provided natively, and the exit status is main's return or exit's argument; -t traces every instruction.
 
 #include "Asm.h"
+#include "C6xDis.h"
 #include "Cpu.h"
 #include "Runtime.h"
 
@@ -69,6 +70,8 @@ int main(int argc, char **argv) {
     _setmode(_fileno(stdout), _O_BINARY);
     _setmode(_fileno(stderr), _O_BINARY);
 #endif
+    if (argc > 1 && (std::strcmp(argv[1], "--dis") == 0 || std::strcmp(argv[1], "--dis-words") == 0))
+        return c6x::disMain(argc - 1, argv + 1);
     std::vector<std::string> files, args;
     bool trace = false;
     bool counts = false;
