@@ -6,7 +6,8 @@
 //   C$$EXIT   exit and abort end there: the run stops, A4 is the status
 //
 //   vm6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--trace FILE] [--steps N] [--max-cycles N]
-//   -c          on exit, a line on stderr: the CPU cycles from the entry point, and the packets
+//   -c          on exit, a line on stderr: the CPU cycles and packets from main (or --count-from ADDR), as TI's
+//               simulator counts once its load has run to main, and the cycles from the entry point
 //   --trace F   after every execute packet, the PC, A0-B31, the control registers and the cycle count - the
 //               lines oracle/remote/trace.js writes from TI's simulator, so the two can be held line by line;
 //               registers as a halted debugger shows them (results in flight landed), or with
@@ -163,7 +164,8 @@ void traceLine(FILE *t, uint64_t k, const Cpu6x &cpu, bool landed) {
 
 int runMain(int argc, char **argv) {
     std::string path, tracePath;
-    bool bin = false, counts = false, haveEntry = false, landedView = true;
+    bool bin = false, counts = false, haveEntry = false, landedView = true, haveCountFrom = false;
+    uint32_t countFrom = 0;
     uint32_t base = 0, entry = 0;
     uint64_t steps = ~uint64_t(0), maxCycles = ~uint64_t(0);
     for (int i = 1; i < argc; i++) {
@@ -174,10 +176,11 @@ int runMain(int argc, char **argv) {
         else if (a == "--steps" && i + 1 < argc) steps = std::strtoull(argv[++i], nullptr, 10);
         else if (a == "--max-cycles" && i + 1 < argc) maxCycles = std::strtoull(argv[++i], nullptr, 10);
         else if (a == "-c") counts = true;
+        else if (a == "--count-from" && i + 1 < argc) { haveCountFrom = true; countFrom = uint32_t(std::strtoul(argv[++i], nullptr, 16)); }
         else if (a.compare(0, 13, "--trace-view=") == 0) landedView = a.substr(13) != "issue";
         else path = a;
     }
-    if (path.empty()) { std::fprintf(stderr, "usage: vm6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--trace FILE] [--steps N]\n"); return 2; }
+    if (path.empty()) { std::fprintf(stderr, "usage: vm6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--count-from ADDR] [--trace FILE] [--trace-view=issue] [--steps N] [--max-cycles N]\n"); return 2; }
     Image img;
     std::string why;
     if (!loadImage(path, img, why, bin, base)) { std::fprintf(stderr, "vm6747: %s\n", why.c_str()); return 1; }
@@ -204,7 +207,14 @@ int runMain(int argc, char **argv) {
     bool haveExit = findSymbol(img, { "C$$EXIT" }, exitAt);
     findSymbol(img, { "_CIOBUF_", "__CIOBUF_" }, host.cioBuf);
     bool exited = false;
+    // TI's simulator counts from main: its loadProgram runs the boot to main before the clock is reset.
+    uint32_t mainAt = 0;
+    bool haveMain = haveCountFrom ? true : findSymbol(img, { "main", "_main" }, mainAt);
+    if (haveCountFrom) mainAt = countFrom;
+    bool atMain = false;
+    uint64_t mainCycle = 0, mainPackets = 0;
     cpu.beforeIssue = [&](uint32_t pc) -> bool {
+        if (haveMain && !atMain && pc == mainAt) { atMain = true; mainCycle = cpu.cycles(); mainPackets = cpu.packets(); }
         if (haveExit && pc == exitAt) { exited = true; return false; }
         if (haveCio && pc == cioAt && host.cioBuf) host.serve();
         return true;
@@ -231,9 +241,12 @@ int runMain(int argc, char **argv) {
     else if (cpu.stopped()) { std::fprintf(stderr, "vm6747: %s\n", cpu.stopReason().c_str()); status = 70; }
     else if (k >= steps || cpu.cycles() >= maxCycles) { std::fprintf(stderr, "vm6747: stopped after %llu steps, %llu cycles, at 0x%08x (%s)\n",
         static_cast<unsigned long long>(k), static_cast<unsigned long long>(cpu.cycles()), cpu.pc(), img.where(cpu.pc()).c_str()); status = 71; }
+    // count: from main, as cycle.CPU reads after TI's loadProgram; entry: from the entry point, the boot included
     if (counts)
-        std::fprintf(stderr, "CYCLES count=%llu packets=%llu exit=%s status=%d\n", static_cast<unsigned long long>(cpu.cycles()),
-                     static_cast<unsigned long long>(cpu.packets()), exited ? "C$$EXIT" : "none", status);
+        std::fprintf(stderr, "CYCLES count=%llu packets=%llu entry=%llu exit=%s status=%d\n",
+                     static_cast<unsigned long long>(atMain ? cpu.cycles() - mainCycle : 0),
+                     static_cast<unsigned long long>(atMain ? cpu.packets() - mainPackets : 0),
+                     static_cast<unsigned long long>(cpu.cycles()), exited ? "C$$EXIT" : "none", status);
     return status & 0xff;
 }
 
