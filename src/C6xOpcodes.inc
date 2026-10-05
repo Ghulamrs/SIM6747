@@ -126,7 +126,7 @@ C6X_FORMAT(nfu_spkernelr, 32, 0x36000, 0xfffffffc, 2, { { F_p, 1, { { 0, 1, 0 } 
 C6X_FORMAT(nfu_spmask, 32, 0x20000, 0xfc021ffc, 4, { { F_p, 1, { { 0, 1, 0 } } }, { F_s, 1, { { 1, 1, 0 } } }, { F_op, 1, { { 13, 4, 0 } } }, { F_mask, 1, { { 18, 8, 0 } } } })
 C6X_FORMAT(nfu_uspl, 16, 0xc66, 0xbc7e, 2, { { F_op, 1, { { 0, 1, 0 } } }, { F_ii, 2, { { 7, 3, 0 }, { 14, 1, 3 } } } })
 C6X_FORMAT(nfu_uspldr, 16, 0x8c66, 0xbc7e, 4, { { F_op, 1, { { 0, 1, 0 } } }, { F_s, 1, { { 0, 1, 0 } } }, { F_z, 1, { { 3, 1, 0 } } }, { F_ii, 2, { { 7, 3, 0 }, { 14, 1, 3 } } } })
-C6X_FORMAT(nfu_uspk, 16, 0x1c66, 0x3c7e, 1, { { F_fstgfcyc, 3, { { 0, 1, 0 }, { 7, 3, 1 }, { 14, 2, 4 } } } })
+C6X_FORMAT(nfu_uspk, 16, 0x1c66, 0x3c7e, 1, { { F_fstgfcyc, 3, { { 7, 3, 0 }, { 14, 2, 3 }, { 0, 1, 5 } } } })
 C6X_FORMAT(nfu_uspma, 16, 0x2c66, 0x3c7e, 1, { { F_mask, 3, { { 0, 1, 0 }, { 7, 3, 1 }, { 14, 2, 4 } } } })
 C6X_FORMAT(nfu_uspmb, 16, 0x3c66, 0x3c7e, 1, { { F_mask, 3, { { 0, 1, 0 }, { 7, 3, 1 }, { 14, 2, 4 } } } })
 C6X_FORMAT(nfu_unop, 16, 0xc6e, 0x1fff, 1, { { F_n, 1, { { 13, 3, 0 } } } })
