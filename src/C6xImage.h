@@ -26,6 +26,7 @@ class Image : public CodeReader {
 public:
     std::vector<Section> sections;
     std::map<uint32_t, std::string> symbolsAt;     // address -> name, for listings and traces
+    std::map<uint32_t, int> rankAt;                // how much that name is wanted (C6xImage.cpp, nameRank)
     std::map<std::string, uint32_t> symbols;       // name -> address
     uint32_t entry = 0;
     bool hasEntry = false;

@@ -39,14 +39,22 @@ std::string Image::where(uint32_t addr) const {
 static uint16_t u16(const std::vector<uint8_t> &f, size_t o) { return static_cast<uint16_t>(f[o] | (f[o + 1] << 8)); }
 static uint32_t u32(const std::vector<uint8_t> &f, size_t o) { return f[o] | (f[o + 1] << 8) | (f[o + 2] << 16) | (uint32_t(f[o + 3]) << 24); }
 
-static void addSymbol(Image &img, const std::string &name, uint32_t value) {
+// How much a listing or a fault wants a name for its address: a function's over anything else, then a C name, then
+// the linker's and runtime's own (__TI_exidx_linkto_scn_start_N alias every function start), assembler
+// temporaries ($C$L1, .L1) last.
+static int nameRank(const std::string &n, bool function) {
+    if (n[0] == '$' || n.compare(0, 2, ".L") == 0) return 4;
+    if (n.compare(0, 27, "__TI_exidx_linkto_scn_start") == 0 || n.compare(0, 14, "__c6xabi_extab") == 0) return 3;
+    if (n.compare(0, 4, "__TI") == 0 || n.find('$') != std::string::npos) return 2;
+    return function ? 0 : 1;
+}
+static void addSymbol(Image &img, const std::string &name, uint32_t value, bool function = false) {
     if (name.empty()) return;
     img.symbols[name] = value;
-    // One name an address: the first a listing would want - a C name over an assembler temporary.
     std::map<uint32_t, std::string>::iterator i = img.symbolsAt.find(value);
-    bool temp = name[0] == '$' || name.compare(0, 2, ".L") == 0;
-    if (i == img.symbolsAt.end()) img.symbolsAt[value] = name;
-    else if (!temp && (i->second[0] == '$' || i->second.compare(0, 2, ".L") == 0)) i->second = name;
+    int rank = nameRank(name, function);
+    if (i == img.symbolsAt.end()) { img.symbolsAt[value] = name; img.rankAt[value] = rank; }
+    else if (rank < img.rankAt[value]) { i->second = name; img.rankAt[value] = rank; }
 }
 
 // ---- ELF (the C6000 EABI, SPRAB89) ----------------------------------------------------------------------
@@ -98,7 +106,7 @@ static bool loadElf(const std::vector<uint8_t> &f, Image &img, std::string &why)
             uint16_t shndx = u16(f, o + 14);
             unsigned stype = info & 0xf;
             if (shndx == 0 || stype == 3 || stype == 4) continue;   // undefined, section, file
-            addSymbol(img, str(sh[i].link, name), value);
+            addSymbol(img, str(sh[i].link, name), value, stype == 2);
         }
     }
     return true;
@@ -145,7 +153,8 @@ static bool loadCoff(const std::vector<uint8_t> &f, Image &img, std::string &why
         size_t o = symptr + s * 18;
         int16_t scnum = static_cast<int16_t>(u16(f, o + 12));
         uint8_t sclass = f[o + 16], naux = f[o + 17];
-        if (scnum > 0 && (sclass == 2 || sclass == 3 || sclass == 6)) addSymbol(img, name8(o), u32(f, o + 8));
+        // COFF type 0x20 is DT_FCN: a function
+        if (scnum > 0 && (sclass == 2 || sclass == 3 || sclass == 6)) addSymbol(img, name8(o), u32(f, o + 8), (u16(f, o + 14) & 0x30) == 0x20);
         s += naux;
     }
     return true;
