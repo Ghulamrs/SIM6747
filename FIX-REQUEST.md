@@ -36,7 +36,14 @@ defects, each with a reproducer, and section 1 gives the analysis behind them.
    wrong answer. Check the DP compares (`CMPEQDP`, `CMPLTDP`, `CMPGTDP`) for NaN as unordered, and the division path
    for NaN and infinity. See `docs/TEST-2026-10-06.md`.
 
-D1, D2 and D3 are fixed and on `master`. D4, D5 and D6 are open.
+D1, D2 and D3 are fixed and on `master`. D4, D5 and D6 were fixed on 2026-10-06, each with its test:
+- D6 `2212e50` - fphead RS added 16 to a compact MV's 5-bit register (`tests/c6x-rs-mv5.sh`);
+- D5 `32eddab` - a BNOP in an SPLOOP epilog let the next packet issue before it landed (`tests/c6x-epilog-bnop.sh`);
+- D4 `dbee128` - the compact SPKERNEL's fstg/fcyc bit order (`tests/c6x-uspk.sh`).
+
+All 49 images now run to `C$$EXIT` with the oracle's output (checked against `oracle/ship/res`, not re-run on the
+boxes); vm6747sim/`cycle.CPU` stays 0.94-1.00. Still to do: re-run on the Linux and Windows boxes, and confirm the
+Uspk bit order against `dis6x`.
 
 The review's scratch patches for D1–D3 are described at the end of its section 4. They got
 32 of 49 images running to `C$$EXIT` with correct output.
