@@ -48,7 +48,7 @@ static inline uint64_t bits64(double d) {
     return v;
 }
 static int32_t toInt(double d, bool truncate) {
-    if (d != d) return 0x7fffffff;                       // to be checked against the simulator
+    if (d != d) return int32_t(0x80000000u);            // SPINT/DPINT of a NaN: 8000 0000h (SPRUFE8, SPINT)
     double r = truncate ? std::trunc(d) : std::nearbyint(d);
     if (r >= 2147483647.0) return 0x7fffffff;
     if (r <= -2147483648.0) return int32_t(0x80000000u);
