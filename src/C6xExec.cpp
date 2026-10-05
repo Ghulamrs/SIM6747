@@ -196,6 +196,8 @@ void Cpu6x::execute(const Exec &x) {
         mo.signExt = signExt;
         const Operand &dop = in.op[dataOp];
         mo.reg = dop.reg; mo.pair = dop.kind == Operand::Pair;
+        // A store's data is read in E1, with its address (SPRUFE8 4.2.3): only the write to memory waits for E3.
+        if (store) mo.value = mo.pair ? (uint64_t(valueAt(mo.reg + 1, x.issue)) << 32 | valueAt(mo.reg, x.issue)) : valueAt(mo.reg, x.issue);
         const OperandInfo &doi = op.op[dataOp];
         mo.landAt = x.issue + (doi.lowLast ? doi.lowLast : 5) - 1;
         memops_.push_back(mo);

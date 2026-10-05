@@ -162,7 +162,6 @@ void Cpu6x::cycleEnd() {
                 writeReg(m.reg, uint32_t(v), m.landAt, m.by);
                 if (m.pair) writeReg(m.reg + 1, uint32_t(v >> 32), m.landAt, m.by);
             } else {
-                m.value = m.pair ? (uint64_t(valueAt(m.reg + 1, c)) << 32 | valueAt(m.reg, c)) : valueAt(m.reg, c);
                 switch (m.size) {
                 case 1: mem_.write8(m.addr, uint8_t(m.value)); break;
                 case 2: mem_.write16(m.addr, uint16_t(m.value)); break;
@@ -216,7 +215,7 @@ void Cpu6x::flushStores() {
     for (size_t i = 0; i < memops_.size(); ) {
         MemOp &m = memops_[i];
         if (!m.store) { i++; continue; }
-        uint64_t v = m.pair ? (uint64_t(valueAt(m.reg + 1, cycle_)) << 32 | valueAt(m.reg, cycle_)) : valueAt(m.reg, cycle_);
+        uint64_t v = m.value;
         switch (m.size) {
         case 1: mem_.write8(m.addr, uint8_t(v)); break;
         case 2: mem_.write16(m.addr, uint16_t(v)); break;
@@ -264,7 +263,7 @@ void Cpu6x::issue(const std::vector<const Insn *> &packet, uint32_t packetPc, ui
         for (unsigned k = 0; k < in->noperands; k++) {
             const OperandInfo &oi = op.op[k];
             if (oi.rw != RW_r && oi.rw != RW_rw) continue;
-            if (op.flags & K_STORE) continue;          // a store's data is read in E3 by its memory operation
+            if (op.flags & K_STORE) continue;          // a store's data: read in E1 by its memory operation
             last = std::max<unsigned>(last, std::max(oi.lowFirst, oi.highFirst));
         }
         Exec x; x.in = in; x.issue = c; x.at = c + last - 1; x.packetPc = packetPc; x.nextPc = nextPc; x.fromBuffer = fromBuffer;
