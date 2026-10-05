@@ -1,13 +1,13 @@
 ©2026 G. R. Akhtar - VM6747-sim (C6747 simulator) 1.0
 Release seal, version 1.0, sealed 06-10-2026
 Written by tools/seal; check it with `tools/seal check`.
-CRC32  size  file - 27 files, seal 90BF5DE4
+CRC32  size  file - 27 files, seal D44AB117
 ------------------------------------------------------------------
 9F6E4213     32876  src/Asm.cpp
 7E57EAB1       993  src/Asm.h
 F7F5102B     14432  src/C6xCpu.cpp
 C9905C05      7005  src/C6xCpu.h
-66996EFA     19669  src/C6xDecode.cpp
+A6D26FC1     19669  src/C6xDecode.cpp
 83591EED      3252  src/C6xDecode.h
 40DCA627      3652  src/C6xDis.cpp
 D3FC8963       131  src/C6xDis.h

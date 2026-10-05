@@ -363,7 +363,7 @@ std::string formatInsn(const CodeReader &mem, const Insn &in) {
         case Operand::Ctrl: { unsigned n; s += controlRegs(n)[o.value].name; break; }
         case Operand::Units: {
             std::string u;
-            for (int i = 0; i < 8; i++) if (o.value & (1 << i)) { u += u.empty() ? "" : ","; u += "LSDM"[i / 2]; u += char('1' + (i & 1)); }
+            for (int i = 0; i < 8; i++) if ((o.value >> i) & 1) { u += u.empty() ? "" : ","; u += "LSDM"[i / 2]; u += char('1' + (i & 1)); }
             s += u; break;
         }
         case Operand::Fstg: case Operand::Fcyc: {
