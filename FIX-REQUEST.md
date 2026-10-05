@@ -31,6 +31,13 @@ defects, each with a reproducer, and section 1 gives the analysis behind them.
    - Review the epilog drain and the SPMASK handling in `src/C6xLoop.cpp` against SPRUFE8
      chapter 7.
 
+6. **D6 (new, 2026-10-06): NaN and infinity.** `runtime-shapes.cpp11-O2` runs to `C$$EXIT` and prints `0 0 -2 3`
+   where the C6747 prints `1 1 -2 3`: `std::isnan(0.0 / 0.0)` and `std::isinf(1.0 / 0.0)` answer 0. It is a silent
+   wrong answer. Check the DP compares (`CMPEQDP`, `CMPLTDP`, `CMPGTDP`) for NaN as unordered, and the division path
+   for NaN and infinity. See `docs/TEST-2026-10-06.md`.
+
+D1, D2 and D3 are fixed and on `master`. D4, D5 and D6 are open.
+
 The review's scratch patches for D1–D3 are described at the end of its section 4. They got
 32 of 49 images running to `C$$EXIT` with correct output.
 
