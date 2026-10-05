@@ -22,9 +22,10 @@ trap 'rm -rf "$WORK"' EXIT
 mkdir -p "$WORK/oracle/programs"
 cp "$HERE"/remote/* "$WORK/oracle/"
 cp "$C6747/C6747.cmd" "$C6747/c6747ca-windows.ccxml" "$C6747/c6747ca-linux.ccxml" "$WORK/oracle/"
-cp "$HERE"/programs/*.c "$WORK/oracle/programs/"
+cp "$HERE"/programs/*.c "$HERE"/programs/*.cpp "$WORK/oracle/programs/"
 python3 "$HERE/gen-words.py" 4096 6747 > "$WORK/oracle/words.asm"
-( cd "$WORK" && COPYFILE_DISABLE=1 tar czf oracle.tgz --exclude "._*" oracle )
+# --no-mac-metadata: no com.apple.provenance headers for GNU tar on the box to warn about
+( cd "$WORK" && { COPYFILE_DISABLE=1 tar czf oracle.tgz --no-mac-metadata --exclude "._*" oracle 2>/dev/null || COPYFILE_DISABLE=1 tar czf oracle.tgz --exclude "._*" oracle; } )
 
 linux() {
     echo "== linux: $LINUX"

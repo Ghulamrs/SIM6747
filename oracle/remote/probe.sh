@@ -38,18 +38,26 @@ grep -rl --include=*.xml -e "C674x CPU Cycle Accurate" -e "C6747 Device Function
 if [ -f words.asm ]; then
     cl6x -mv6740 --abi=eabi -c words.asm --obj_directory=out > out/words.build.log 2>&1
     dis6x out/words.obj > out/words.dis 2>&1
+    dis6x -d out/words.obj > out/words-d.dis 2>&1      # -d: data sections disassembled too, should .text still come out as data
     dis6x --help > out/dis6x-help.txt 2>&1
 fi
 
 # ---- programs --------------------------------------------------------------------------------
-LINK="-z --heap_size=0x8000 --stack_size=0x2000 --rom_model $W/C6747.cmd -l$CG/lib/rts6740_elf.lib"
-for c in programs/*.c; do
+# The exception-handling build of the runtime, as every C++ program here links: its __TI_eb_init is where the
+# review's D2 lived, unreachable from rts6740_elf.lib (built once with mklib, see Emulator/tests/ti.sh).
+EHLIB=${C6747_EHLIB:-$HOME/c6747-lib}
+RTS=$CG/lib/rts6740_elf.lib
+[ -f "$EHLIB/rts6740_elf_eh.lib" ] && RTS=$EHLIB/rts6740_elf_eh.lib
+echo "runtime $RTS" >> out/inventory.txt
+LINK="-z --heap_size=0x8000 --stack_size=0x2000 --rom_model $W/C6747.cmd -l$RTS"
+for c in programs/*.c programs/*.cpp; do
     [ -f "$c" ] || continue
-    n=$(basename "$c" .c)
+    n=$(basename "$c"); n=${n%.*}
+    case "$c" in *.cpp) EXC=--exceptions ;; *) EXC= ;; esac
     for lvl in O2 O0; do
         b=out/programs/$n.$lvl
         opt=-O2; [ $lvl = O0 ] && opt=
-        cl6x -mv6740 --abi=eabi $opt ${TI_COMPRESS:-} --symdebug:none -I"$CG/include" --obj_directory=out/programs \
+        cl6x -mv6740 --abi=eabi $opt $EXC ${TI_COMPRESS:-} --symdebug:none -I"$CG/include" --obj_directory=out/programs \
             "$c" $LINK -m $b.map -o $b.out > $b.build.log 2>&1
         [ -f $b.out ] || { echo "PROGRAM $n.$lvl build=FAILED"; continue; }
         dis6x $b.out > $b.dis 2>&1

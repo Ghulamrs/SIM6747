@@ -33,18 +33,25 @@ rem ---- words
 if exist words.asm (
   cl6x -mv6740 --abi=eabi -c words.asm --obj_directory=out > out\words.build.log 2>&1
   dis6x out\words.obj > out\words.dis 2>&1
+  dis6x -d out\words.obj > out\words-d.dis 2>&1
   dis6x --help > out\dis6x-help.txt 2>&1
 )
 
 rem ---- programs
-set LINK=-z --heap_size=0x8000 --stack_size=0x2000 --rom_model "%W%\C6747.cmd" -l"%CG%\lib\rts6740_elf.lib"
+if "%C6747_EHLIB%"=="" set C6747_EHLIB=C:\cxx1\c6747-lib
+set RTS=%CG%\lib\rts6740_elf.lib
+if exist "%C6747_EHLIB%\rts6740_elf_eh.lib" set RTS=%C6747_EHLIB%\rts6740_elf_eh.lib
+echo runtime %RTS%>> out\inventory.txt
+set LINK=-z --heap_size=0x8000 --stack_size=0x2000 --rom_model "%W%\C6747.cmd" -l"%RTS%"
 type nul > out\programs.txt
-for %%c in (programs\*.c) do (
+for %%c in (programs\*.c programs\*.cpp) do (
+  set EXC=
+  if /i "%%~xc"==".cpp" set EXC=--exceptions
   for %%l in (O2 O0) do (
     set B=out\programs\%%~nc.%%l
     set OPT=-O2
     if "%%l"=="O0" set OPT=
-    cl6x -mv6740 --abi=eabi !OPT! %TI_COMPRESS% --symdebug:none -I"%CG%\include" --obj_directory=out\programs "%%c" %LINK% -m !B!.map -o !B!.out > !B!.build.log 2>&1
+    cl6x -mv6740 --abi=eabi !OPT! !EXC! %TI_COMPRESS% --symdebug:none -I"%CG%\include" --obj_directory=out\programs "%%c" %LINK% -m !B!.map -o !B!.out > !B!.build.log 2>&1
     if exist !B!.out (
       dis6x !B!.out > !B!.dis 2>&1
       ofd6x -v !B!.out > !B!.ofd 2>&1
