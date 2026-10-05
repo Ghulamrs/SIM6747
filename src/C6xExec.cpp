@@ -566,8 +566,11 @@ void Cpu6x::execute(const Exec &x) {
     }
     case MN_BPOS: if (int32_t(S(1)) >= 0) branch(uint32_t(in.op[0].value)); break;
     case MN_MVC: {
-        if (in.op[1].kind == Operand::Ctrl) {
-            int cr = ctrlOf(in.op[1].value);
+        // To a control register: MVC's 32-bit form names it by its crlo/crhi fields, the compact Sx1 form
+        // (rts6740's writemsg: SPLOOPD 1 || MVC B6,ILC) by the ILC operand itself.
+        const bool toIlc = in.op[1].kind == Operand::Text && std::strcmp(in.op[1].text, "ILC") == 0;
+        if (in.op[1].kind == Operand::Ctrl || toIlc) {
+            int cr = toIlc ? int(CR_ILC) : ctrlOf(in.op[1].value);
             if (cr < 0) { fault("MVC to a control register this CPU does not have", &in); break; }
             uint32_t v = S(0);
             uint64_t at = x.issue;
