@@ -12,7 +12,7 @@ import struct, sys
 w = [0x018002a8, 0x020003a8, 0x02906078, 0x0200802a, 0x0240006a, 0x029002f4, 0x031002e4, 0x00006000, 0, 0, 0, 0, 0, 0, 0, 0]
 open(sys.argv[1], 'wb').write(b''.join(struct.pack('<I', x) for x in w))
 PY
-"$VM" --run "$T.bin" --bin 80001000 --steps 9 --trace "$T.trace" 2>/dev/null
+"$VM" --run "$T.bin" --bin 80001000 --steps 9 --trace "$T.trace" --trace-view=issue 2>/dev/null
 # columns: S k PC A0..: A5 is field 9, A6 field 10; the cycle count is last
 got=$(awk '$1=="S" {print $2, $3, $9, $10, $NF}' "$T.trace")
 want='0 80001000 00000000 00000000 0

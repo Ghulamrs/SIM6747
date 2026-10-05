@@ -42,6 +42,10 @@ public:
     bool step();
     // Let everything in flight land: what a debugger shows after a halt.
     void drain();
+    // A register as a halted debugger shows it - with every result already in flight landed, a pending load's
+    // word read from memory as it stands - without the machine moving on (--trace's default view).
+    uint32_t landedReg(int r) const;
+    uint32_t landedCtrl(int c) const;
     // Stores in flight reach memory now, without a cycle passing: what a debugger halted at a breakpoint sees.
     void flushStores();
     bool stopped() const { return stopped_; }

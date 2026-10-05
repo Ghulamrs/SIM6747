@@ -211,6 +211,31 @@ bool Cpu6x::step() {
     return !stopped_;
 }
 
+uint32_t Cpu6x::landedReg(int r) const {
+    uint32_t v = r_[r];
+    uint64_t best = 0; bool have = false;
+    for (const Write &w : writes_) if (w.reg == r && (!have || w.at >= best)) { v = w.value; best = w.at; have = true; }
+    for (const MemOp &m : memops_) {
+        if (m.store || (m.reg != r && !(m.pair && m.reg + 1 == r)) || (have && best > m.landAt)) continue;
+        uint64_t x = 0;
+        switch (m.size) {
+        case 1: x = mem_.read8(m.addr); if (m.signExt) x = uint64_t(int64_t(int8_t(x))); break;
+        case 2: x = mem_.read16(m.addr); if (m.signExt) x = uint64_t(int64_t(int16_t(x))); break;
+        case 4: x = mem_.read32(m.addr); break;
+        default: x = mem_.read64(m.addr); break;
+        }
+        v = m.reg == r ? uint32_t(x) : uint32_t(x >> 32);
+        best = m.landAt; have = true;
+    }
+    return v;
+}
+uint32_t Cpu6x::landedCtrl(int c) const {
+    uint32_t v = readCtrl(c, cycle_);
+    uint64_t best = 0; bool have = false;
+    for (const Write &w : writes_) if (w.reg == 64 + c && (!have || w.at >= best)) { v = w.value; best = w.at; have = true; }
+    return v;
+}
+
 void Cpu6x::flushStores() {
     for (size_t i = 0; i < memops_.size(); ) {
         MemOp &m = memops_[i];

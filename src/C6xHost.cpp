@@ -8,7 +8,9 @@
 //   vm6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--trace FILE] [--steps N] [--max-cycles N]
 //   -c          on exit, a line on stderr: the CPU cycles from the entry point, and the packets
 //   --trace F   after every execute packet, the PC, A0-B31, the control registers and the cycle count - the
-//               lines oracle/remote/trace.js writes from TI's simulator, so the two can be held line by line
+//               lines oracle/remote/trace.js writes from TI's simulator, so the two can be held line by line;
+//               registers as a halted debugger shows them (results in flight landed), or with
+//   --trace-view=issue  as the register file holds them at the end of the step
 
 #include "C6xHost.h"
 #include "C6xCpu.h"
@@ -148,10 +150,12 @@ void traceHeader(FILE *t) {
     for (int c = 0; c < Cpu6x::CR_count; c++) std::fprintf(t, " %s", Cpu6x::ctrlName(c));
     std::fprintf(t, " CYC\n");
 }
-void traceLine(FILE *t, uint64_t k, const Cpu6x &cpu) {
+// landed: registers as a halted debugger shows them, results in flight landed (what trace.js reads from TI's
+// simulator); otherwise as they stand in the register file at the end of the step.
+void traceLine(FILE *t, uint64_t k, const Cpu6x &cpu, bool landed) {
     std::fprintf(t, "S %llu %08x", static_cast<unsigned long long>(k), cpu.pc());
-    for (int r = 0; r < 64; r++) std::fprintf(t, " %08x", cpu.reg(r));
-    for (int c = 0; c < Cpu6x::CR_count; c++) std::fprintf(t, " %08x", cpu.ctrl(c));
+    for (int r = 0; r < 64; r++) std::fprintf(t, " %08x", landed ? cpu.landedReg(r) : cpu.reg(r));
+    for (int c = 0; c < Cpu6x::CR_count; c++) std::fprintf(t, " %08x", landed ? cpu.landedCtrl(c) : cpu.ctrl(c));
     std::fprintf(t, " %llu\n", static_cast<unsigned long long>(cpu.cycles()));
 }
 
@@ -159,7 +163,7 @@ void traceLine(FILE *t, uint64_t k, const Cpu6x &cpu) {
 
 int runMain(int argc, char **argv) {
     std::string path, tracePath;
-    bool bin = false, counts = false, haveEntry = false;
+    bool bin = false, counts = false, haveEntry = false, landedView = true;
     uint32_t base = 0, entry = 0;
     uint64_t steps = ~uint64_t(0), maxCycles = ~uint64_t(0);
     for (int i = 1; i < argc; i++) {
@@ -170,6 +174,7 @@ int runMain(int argc, char **argv) {
         else if (a == "--steps" && i + 1 < argc) steps = std::strtoull(argv[++i], nullptr, 10);
         else if (a == "--max-cycles" && i + 1 < argc) maxCycles = std::strtoull(argv[++i], nullptr, 10);
         else if (a == "-c") counts = true;
+        else if (a.compare(0, 13, "--trace-view=") == 0) landedView = a.substr(13) != "issue";
         else path = a;
     }
     if (path.empty()) { std::fprintf(stderr, "usage: vm6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--trace FILE] [--steps N]\n"); return 2; }
@@ -211,13 +216,13 @@ int runMain(int argc, char **argv) {
         if (!trace) { std::fprintf(stderr, "vm6747: cannot write %s\n", tracePath.c_str()); return 1; }
         traceHeader(trace);
         std::fprintf(trace, "# EXIT %08x\n", haveExit ? exitAt : 0xffffffffu);
-        traceLine(trace, 0, cpu);
+        traceLine(trace, 0, cpu, landedView);
     }
     uint64_t k = 0;
     while (k < steps && cpu.cycles() < maxCycles) {
         if (!cpu.step()) break;
         k++;
-        if (trace) traceLine(trace, k, cpu);
+        if (trace) traceLine(trace, k, cpu, landedView);
     }
     std::fflush(stdout);
     if (trace) { std::fprintf(trace, "# END steps=%llu\n", static_cast<unsigned long long>(k)); std::fclose(trace); }
