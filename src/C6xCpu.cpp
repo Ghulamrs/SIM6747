@@ -30,8 +30,10 @@ int ctrlOf(int64_t tableIndex) {
 Cpu6x::Cpu6x(Memory &mem) : mem_(mem) {
     std::memset(r_, 0, sizeof r_);
     std::memset(cr_, 0, sizeof cr_);
-    // CSR's CPU ID and revision for the C674x (SPRUFE8 2.8.4: CPU ID 0x14), and supervisor mode.
-    cr_[CR_CSR] = 0x14000000u | 0x0100u;
+    // As the CCS 5.5 C6747 simulator reports them (review 2026-10-05): CSR's CPU ID 0x44, revision 1 and bit 8;
+    // DNUM, the core number, 1.
+    cr_[CR_CSR] = 0x44010100u;
+    cr_[CR_DNUM] = 1;
     cr_[CR_GFPGFR] = 0x0700001Du;     // its reset value: size 7, polynomial 0x1D
     reader_.m = &mem_;
 }
