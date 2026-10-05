@@ -54,7 +54,12 @@ SPKERNELs in the cl6x images, 150 of them with a non-zero fstg. Every fcyc in th
    TI's `16 0: 1872870048 2190`. That is 160 differing lines in all.
 
 Both images, the other cl6x 8.2.2 builds and CCS 5.5's results for them are in `oracle/ship/img822/`, which git ignores. The
-other 30 programs built by cl6x 8.2.2 match TI's simulator byte for byte; see `docs/TEST-2026-10-06.md`. D7 and D8 are open.
+other 30 programs built by cl6x 8.2.2 match TI's simulator byte for byte; see `docs/TEST-2026-10-06.md`. D7 and D8 were fixed on 2026-10-06:
+- D7 `982fa00` - RS added 16 to a compact compare's 1-bit destination (`tests/c6x-rs-cmp1.sh`);
+- D8 `000488c` - the compact LDNDW/STNDW ++/-- stepped by bytes, not doublewords (`tests/c6x-ndw-inc.sh`).
+
+All 81 images (the 49 and the 32 from cl6x 8.2.2) match their oracle output on the Mac's Linux VM; not yet re-run on the
+boxes. The compact LDNDW/STNDW offset forms (Doff4dw, Dinddw) are still read unscaled - unconfirmed against dis6x.
 
 The review's scratch patches for D1–D3 are described at the end of its section 4. They got
 32 of 49 images running to `C$$EXIT` with correct output.
