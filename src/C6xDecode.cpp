@@ -152,8 +152,11 @@ static bool decodeWord(uint32_t word, unsigned bits, const Header &h, Insn &in) 
                 if (!f) { ok = false; break; }
                 uint32_t v = fieldBits(word, *f);
                 // fphead RS moves a compact instruction's 3-bit register fields to A16-A31/B16-B31. MV's lsdmvto and
-                // lsdmvfr also carry a full 5-bit register, which names any register already: RS leaves that one alone.
-                const int fieldBase = fieldWidth(*f) >= 5 ? 0 : regBase;
+                // lsdmvfr also carry a full 5-bit register, which names any register already, and the compact compares
+                // and logicals (L2c, Lx1c, Lx3c) a 1-bit destination, which is A0/A1 or B0/B1 - the predicate
+                // registers, as their results are meant to be: RS leaves both alone.
+                const unsigned fw = fieldWidth(*f);
+                const int fieldBase = (fw >= 5 || fw == 1) ? 0 : regBase;
                 switch (enc.coding) {
                 case C_cst_s3i:
                     if (v == 0) v = 16; else if (v == 7) v = 8;
