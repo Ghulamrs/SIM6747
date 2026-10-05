@@ -151,6 +151,9 @@ static bool decodeWord(uint32_t word, unsigned bits, const Header &h, Insn &in) 
                 const FormatField *f = findField(fmt, enc.id);
                 if (!f) { ok = false; break; }
                 uint32_t v = fieldBits(word, *f);
+                // fphead RS moves a compact instruction's 3-bit register fields to A16-A31/B16-B31. MV's lsdmvto and
+                // lsdmvfr also carry a full 5-bit register, which names any register already: RS leaves that one alone.
+                const int fieldBase = fieldWidth(*f) >= 5 ? 0 : regBase;
                 switch (enc.coding) {
                 case C_cst_s3i:
                     if (v == 0) v = 16; else if (v == 7) v = 8;
@@ -177,22 +180,22 @@ static bool decodeWord(uint32_t word, unsigned bits, const Header &h, Insn &in) 
                     // fall through
                 case C_reg:
                     switch (oinfo.form) {
-                    case O_treg: o.kind = Operand::Reg; o.reg = (tval ? 32 : 0) + regBase + int(v); done = true; break;
-                    case O_reg: o.kind = Operand::Reg; o.reg = sideBase + regBase + int(v); done = true; break;
+                    case O_treg: o.kind = Operand::Reg; o.reg = (tval ? 32 : 0) + fieldBase + int(v); done = true; break;
+                    case O_reg: o.kind = Operand::Reg; o.reg = sideBase + fieldBase + int(v); done = true; break;
                     case O_reg_nors: o.kind = Operand::Reg; o.reg = sideBase + int(v); done = true; break;
-                    case O_reg_bside: o.kind = Operand::Reg; o.reg = 32 + regBase + int(v); done = true; break;
+                    case O_reg_bside: o.kind = Operand::Reg; o.reg = 32 + fieldBase + int(v); done = true; break;
                     case O_reg_bside_nors: o.kind = Operand::Reg; o.reg = 32 + int(v); done = true; break;
-                    case O_xreg: o.kind = Operand::Reg; o.reg = (((side == 2) != cross) ? 32 : 0) + regBase + int(v); done = true; break;
-                    case O_dreg: o.kind = Operand::Reg; o.reg = (dataSide == 2 ? 32 : 0) + regBase + int(v); done = true; break;
+                    case O_xreg: o.kind = Operand::Reg; o.reg = (((side == 2) != cross) ? 32 : 0) + fieldBase + int(v); done = true; break;
+                    case O_dreg: o.kind = Operand::Reg; o.reg = (dataSide == 2 ? 32 : 0) + fieldBase + int(v); done = true; break;
                     case O_regpair: case O_xregpair: case O_dregpair: case O_tregpair: {
                         if (v & 1) { ok = false; break; }
                         int b = oinfo.form == O_regpair ? sideBase
                               : oinfo.form == O_xregpair ? (((side == 2) != cross) ? 32 : 0)
                               : oinfo.form == O_dregpair ? (dataSide == 2 ? 32 : 0) : (tval ? 32 : 0);
-                        o.kind = Operand::Pair; o.reg = b + regBase + int(v); done = true; break;
+                        o.kind = Operand::Pair; o.reg = b + fieldBase + int(v); done = true; break;
                     }
                     case O_mem_deref:
-                        o.kind = Operand::Mem; o.base = sideBase + regBase + int(v); o.mode = M_POS; o.offset = 0; done = true; break;
+                        o.kind = Operand::Mem; o.base = sideBase + fieldBase + int(v); o.mode = M_POS; o.offset = 0; done = true; break;
                     case O_mem_short: case O_mem_ndw: o.base = sideBase + int(v); memBase = true; break;
                     default: ok = false; break;
                     }
