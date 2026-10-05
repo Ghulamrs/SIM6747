@@ -45,7 +45,9 @@ for (var c = 0; c < ctl.length; c++) {
     catch (e) { out.println("# NOREG " + ctl[c]); }
 }
 out.println("# REGS PC " + regs.join(" ") + " " + have.join(" ") + " CYC");
-function hex(v) { var s = Long.toHexString(v & 0xffffffff); while (s.length < 8) s = "0" + s; return s; }
+// A register as eight hex digits: DSS hands a negative value back sign-extended, and JavaScript's & works on 32-bit
+// signed numbers, so the low word is taken arithmetically.
+function hex(v) { var u = Number(v) % 4294967296; if (u < 0) u += 4294967296; var s = u.toString(16); while (s.length < 8) s = "0" + s; return s; }
 function line(k) {
     var s = "S " + k + " " + hex(session.memory.readRegister("PC"));
     for (var j = 0; j < regs.length; j++) s += " " + hex(session.memory.readRegister(regs[j]));
