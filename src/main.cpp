@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
             return 0;
         }
         if (a == "--version") {
-            std::printf("\xc2\xa9" "2026 G. R. Akhtar - VM6747 (C6000 emulator) 1.0\n");
+            std::printf("\xc2\xa9" "2026 G. R. Akhtar - VM6747-sim (C6747 simulator) 1.0\n");
             return 0;
         }
         if (isDirectory(a)) {
