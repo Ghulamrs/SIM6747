@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+"""The release seal: a CRC32 of every file this program is made of.
+
+    tools/seal write      write <name>-<version>.dat from what is on disk
+    tools/seal check      verify every line of it, and say what moved
+
+What is sealed is the source code and nothing else (2026-10-05): the directories
+tools/seal.json names, and in them only the files that are code - C, C++,
+Objective-C++ and assembly, and the extension-less library headers under an
+include/ - each sealed as it stands, comments and all. No project, build file,
+script, document or resource: changing how a program is built is not changing it. CRC32 answers "did this file change",
+not "did somebody change it on purpose": a seal on a release, not a signature.
+The same script, byte for byte, serves every project of the workspace.
+"""
+import binascii
+import fnmatch
+import json
+import os
+import sys
+import datetime
+import subprocess
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.normpath(os.path.join(HERE, ".."))
+CONF = json.load(open(os.path.join(HERE, "seal.json")))
+VERSION = CONF["version"]
+NAME = "%s-%s.dat" % (CONF["name"], VERSION)
+BANNER = CONF["banner"]
+SKIP_DIRS = set(CONF.get("skip", [])) | {"xcuserdata", "DerivedData", "obj", "build"}
+
+
+def duplicate(name):
+    """macOS leaves `name 2.ext` copies under ~/Documents; they are not files of the tree."""
+    stem = name.rsplit(".", 1)[0]
+    return len(stem) > 2 and stem[-1].isdigit() and stem[-2] == " "
+
+
+def tracked():
+    """What git tracks here, or None outside a repository: a build product left in a
+    source directory is not part of the release, and the index is what says so."""
+    try:
+        got = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, stdout=subprocess.PIPE,
+                             stderr=subprocess.DEVNULL, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return set(got.decode().split("\0")) - {""}
+
+
+# What source code is, by extension; and an extension-less file under include/ (<vector>, <string>).
+SOURCE_EXT = {".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".inc", ".m", ".mm", ".s", ".asm"}
+
+
+def source(rel):
+    ext = os.path.splitext(rel)[1].lower()
+    return ext in SOURCE_EXT or (ext == "" and "/include/" in "/" + rel)
+
+
+def files():
+    out = []
+    for d in CONF["dirs"]:
+        for where, dirs, names in os.walk(os.path.join(ROOT, d)):
+            dirs[:] = sorted(x for x in dirs if x not in SKIP_DIRS and not x.startswith("."))
+            for n in sorted(names):
+                if n.startswith(".") or duplicate(n) or n.endswith((".exe", ".o", ".obj")):
+                    continue
+                rel = os.path.relpath(os.path.join(where, n), ROOT).replace(os.sep, "/")
+                if source(rel):
+                    out.append(rel)
+    for pattern in CONF.get("files", []):
+        for n in sorted(os.listdir(ROOT)):
+            if fnmatch.fnmatch(n, pattern) and os.path.isfile(os.path.join(ROOT, n)):
+                out.append(n)
+    known = tracked()
+    return sorted(f for f in set(out) if known is None or f in known)
+
+
+def crc(path):
+    p = os.path.join(ROOT, path)
+    with open(p, "rb") as fh:
+        return binascii.crc32(fh.read()) & 0xFFFFFFFF, os.path.getsize(p)
+
+
+def write():
+    rows = [(f,) + crc(f) for f in files()]
+    total = binascii.crc32(
+        ("".join("%s %08X" % (f, c) for f, c, _ in rows)).encode()) & 0xFFFFFFFF
+    with open(os.path.join(ROOT, NAME), "w") as fh:
+        fh.write(BANNER + "\n")
+        fh.write("Release seal, version %s, sealed %s\n"
+                 % (VERSION, datetime.date.today().strftime("%d-%m-%Y")))
+        fh.write("Written by tools/seal; check it with `tools/seal check`.\n")
+        fh.write("CRC32  size  file - %d files, seal %08X\n" % (len(rows), total))
+        fh.write("-" * 66 + "\n")
+        for f, c, n in rows:
+            fh.write("%08X %9d  %s\n" % (c, n, f))
+        fh.write("-" * 66 + "\n")
+        fh.write("Sealed on %s\n" % datetime.date.today().strftime("%d-%m-%Y"))
+    print("wrote %s: %d files, seal %08X" % (NAME, len(rows), total))
+    return 0
+
+
+def check():
+    path = os.path.join(ROOT, NAME)
+    if not os.path.exists(path):
+        print("%s: no such seal - run `tools/seal write`" % NAME)
+        return 1
+    sealed = {}
+    for line in open(path):
+        parts = line.split()
+        if len(parts) == 3 and len(parts[0]) == 8:
+            try:
+                sealed[parts[2]] = (int(parts[0], 16), int(parts[1]))
+            except ValueError:
+                pass
+    now = set(files())
+    bad = 0
+    for f in sorted(set(sealed) | now):
+        if f not in sealed:
+            print("  added   %s" % f); bad += 1
+        elif f not in now:
+            print("  gone    %s" % f); bad += 1
+        elif crc(f) != sealed[f]:
+            print("  changed %s  %08X -> %08X" % (f, sealed[f][0], crc(f)[0])); bad += 1
+    print("seal %s %s: %d files, %d differ" % (CONF["name"], VERSION, len(sealed), bad))
+    return 1 if bad else 0
+
+
+if __name__ == "__main__":
+    what = sys.argv[1] if len(sys.argv) > 1 else "check"
+    if what == "write":
+        sys.exit(write())
+    if what == "check":
+        sys.exit(check())
+    print(__doc__)
+    sys.exit(2)

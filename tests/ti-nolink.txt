@@ -1,0 +1,5 @@
+# Programs that assemble but do not link against TI's runtime, each for a
+# reason that is the program's or the exception runtime's, not the backend's.
+# One name per line, the directory in front; a case that starts linking is a
+# failure here until its line is removed, so this file records rather than hides.
+shm/uses_more                borrows cbrt by name, and TI's runtime has no cbrt

@@ -1,0 +1,5 @@
+vm6747.exe
+*.o
+*.d
+tests/out-*/
+.DS_Store

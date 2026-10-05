@@ -1,0 +1,224 @@
+# vm6747 — the VM6747 emulator
+
+Runs the C6000 assembly that `c90` and `cpp11` emit for `-arch tms6747`,
+so that the fourth target can be verified the way the other three are: the
+same program compiled twice, run twice, and required to agree.
+
+    vm6747 [-t] [-m megabytes] file.s [more.s ...] [-- args]
+
+The files are assembled together — `.text`, `.data`, `.sect ".const"`,
+`.bss sym, size, align`, `.global`, `.weak`, `.align`, `.byte`/`.short`/
+`.word`, `.space`, `.string`, labels, predicates `[A1]`/`[!A1]`, parallel
+bars `||`, unit specifiers (accepted, ignored), register pairs `A5:A4`, and
+the addressing forms `*R`, `*+R(n)`, `*+R[n]`, `*R++(n)` and their kin —
+`main` is called with `argc` and `argv`, and the exit status is `main`'s
+return or `exit`'s argument. `-t` traces every instruction.
+
+## What it models
+
+**The C674x as the compilers see it.** The two register files, a program
+counter, and the pipeline's one visible property: a result lands some cycles
+after its instruction issues — 4 delay slots for a load, 3 for a multiply,
+3/6/9 for single/double-precision arithmetic, 1 for a floating compare — and
+a branch takes effect five execute packets after it. A register read before
+its write lands returns the old value. Two results landing in one register in one cycle - the write
+conflict SPRUFE8 3.8.8 forbids, a hardware exception on the C674x - stop the run with a fault naming both
+instructions (since 2026-10-05; TI's own Example 7-11 has one). That is the whole point: the NOPs in
+the emitted code are the compiler's claim about these latencies, and a
+missing one shows up here as a wrong answer, not as a suspicion. The first
+run found one (`MPY32` with no delay slots).
+
+The double-precision pipeline is split-phase, as SPRUFE8 draws it: a DP
+instruction reads its sources' low words at issue and the high words a cycle
+later, and writes its result low word first, a cycle before the high one -
+the delay-slot count names the high word. cl6x schedules to exactly that
+(`INTDP; NOP 3; MPYDP`); c90 pads past it, which is why the gap showed only
+when TriLab ran cl6x's code here.
+
+Memory effects are immediate at issue, which keeps a store and a later load
+in order. Loads and stores fault on misalignment, as the hardware would.
+Instructions are executed from their parsed operands; nothing here encodes
+or decodes C6000 machine words, and the memory image holds data only. A
+code address is still a real number four bytes apart from the next, so
+labels, function pointers and the PC behave.
+
+**cl6x's assembly as well as the compilers'.** Since TriLab's CCS leg
+(2026-09-18) the emulator runs what TI's compiler writes for the same C: all
+sixty-four registers, `.asg`'s FP/DP/SP, `BNOP`/`RETNOP`/`CALL`+`ADDKPC` with
+their folded NOPs (unconditional, as the manual says), `ADDAD`, `ANDN`, the
+ucst15 address-adds from DP or SP, `.bits`/`.field`, `.group` as a COMDAT
+(one definition kept, like `.weak`), `.string` with byte values, `(sym)` as
+`ADDAW DP,(sym),B5`'s byte displacement (the relocation's scaling, not the
+instruction's), `CALLP` with its five protected slots - a load issued just
+before it lands in them, as cl6x's `LDW; CALLP` relies on - and a directory
+of `.asm` files. What it does not run is TI's compiled C++ runtime, which is
+machine code; what cl6x's `<iostream>` wants of it is supplied natively
+("cl6x's streams" below), so `cout << x` runs here as it does on the part.
+
+**The software pipelined loop buffer**, as SPRUFE8 chapter 7 specifies it, since 2026-10-05 - which is
+what cl6x writes for nearly every loop at `-O2`. An `SPLOOP`, `SPLOOPD` or `SPLOOPW` starts loading:
+each cycle's program instructions run and are stored at the loop buffer count (LBC) with their loading
+counter, and from the next cycle the buffer replays them every `ii` cycles beside whatever program
+memory supplies. ILC counts the iterations down at each stage boundary, four cycles after `MVC` wrote it
+(`SPLOOPD` looks at it only after its first three); `SPLOOPW` ends on its predicate as it stood three
+cycles before the boundary, with no epilog. `SPKERNEL fstg,fcyc` ends the loading and delays program
+fetch that far into the epilog, which drains instructions in the order they were loaded; `SPMASK` and
+`^` run an instruction once without storing it and inhibit the buffer's on the same unit. A conditional
+`SPLOOP(D)` whose condition holds four cycles before its last kernel boundary reloads: the buffer stays
+active until `SPMASKR`, then re-enables its instructions in load order while the previous invocation's
+epilog drains on a second LBC, ILC taking RILC - 1, and a branch landing then stops fetch at its target
+instead of idling the buffer.
+
+**The C library, natively.** A call to a library name lands on a stub below
+the text base and is answered on the host, reading its arguments by the
+convention the compilers emit — A4, B4, A6, B6, A8, B8, A10, B10, A12, B12,
+then the stack from B15+4; for a variadic function the last named argument
+and everything after it on the stack, 8-byte values at 8-byte boundaries —
+and returning in A4 or A5:A4. `printf` and its family, `puts`, `putchar`,
+files (`fopen` … `fclose`, kept in memory until closed), `malloc`/`free`,
+the string and memory functions, `strtod` and friends, `qsort`/`bsearch`
+(calling back into the program), ctype, the C90 math functions,
+`setjmp`/`longjmp` (the callee-saved registers, B15 and B3), `signal`/`raise`,
+`time`/`mktime`/`strftime`/`localtime`, `setlocale`/`localeconv`, `assert`,
+`errno`, and the EABI helpers `__c6xabi_div*`/`rem*`/`fix*`/`flt*`. The three
+standard streams are data the emulator contributes before assembly.
+
+## What it does not model
+
+Machine encoding and fetch packets; functional-unit assignment and the
+resource rules of a parallel packet; the memory system (caches, EDMA,
+and so the stalls TI's `cycle.Total` counts beyond `cycle.CPU`);
+interrupts (so `DINT`/`RINT` do nothing, and a loop is never interrupt-drained); the 40-bit forms beyond ADD/SUB into a pair; and any instruction
+the compilers do not emit and the table in `src/Isa.cpp` does not list —
+such a one is an assembly error, by line.
+
+## Cycles, counted always
+
+The core is counted as it issues: one cycle a packet, n for a `NOP n` (the
+cycles a `BNOP` or `ADDKPC` folds in likewise, and `CALLP`'s five), and a
+branch's five delay slots are the packets already in them. `-c` prints, on stderr after the program and
+its atexit handlers,
+
+    CYCLES count=<cycles from main> packets=<n> natives=<library calls>
+
+from main, as TI's simulator counts once its load has run to main. Without
+`-c` the output is what it was, and the counting costs nothing measurable:
+the six kernels of C++Optimize's `tools/c6747/bench` run in the same time
+before and after, to 0.03 s.
+
+**It is TI's `cycle.CPU`, and not its `cycle.Total`.** Measured 2026-09-29 on
+the C6747 cycle-accurate simulator (CCS 5.5), the kernels as cpp11 -O2 builds
+them, linked with rts6740_elf_eh.lib:
+
+| kernel | vm6747 -c | TI cycle.CPU | | library calls |
+| --- | --- | --- | --- | --- |
+| fib | 4,355,822 | 4,359,843 | -0.09% | 1 |
+| sieve | 12,700,543 | 12,704,800 | -0.03% | 1 |
+| virt | 3,580,521 | 3,584,835 | -0.12% | 1 |
+| isort | 10,127,100 | 10,145,081 | -0.18% | 601 |
+| matmul | 2,715,090 | 2,745,133 | -1.09% | 1,153 |
+| hash | 22,314,120 | 25,090,974 | -11.1% | 126,001 |
+
+What is left is the library: a native call is one cycle here and about 22
+in rts6740, so hash's 2.78 M is its 126,001 calls. On generated code the
+count is within 0.2%. TI's `cycle.Total` adds the memory stalls this does not
+model - for fib 11.03 M of L1D stalls over its 4.36 M - so the stack traffic of
+code that keeps its locals in memory shows there and not here.
+
+`-p` charges the same cycles to functions: each packet to the function it ran
+in (the names on code that are not labels - cpp11's `L.<fn>.<kind>N`, TI's
+`$C$L<n>` and `.L` temporaries are), each native library call to its name,
+from main. Its rows sum to `-c`'s count, and it costs nothing measurable
+either - the kernels run in the same time with `-p` as without:
+
+    PROFILE         cycles      %      packets    entries  function
+    PROFILE       22188066  99.44     14546045          1  _ZL6hashesi
+    PROFILE         126000   0.56            0     126000  [native] __c6xabi_remi
+    PROFILE             53   0.00           34          1  main
+
+(hash at cpp11 -O2: its 126,000 library calls are all `%`.)
+
+## Verification
+
+`Compiler-Ci/tests/tms6747.sh` runs the whole C corpus through it: 399 of
+425 cases agree with clang's native run; the other 26 need a 64-bit long or
+an 8-byte pointer on the reference side and are skipped by name
+(`tests/tms6747-lp64.txt`). C++ through `cpp11` runs the same way; the C++
+ABI runtime (`__dynamic_cast`, the `__cxxabiv1` typeinfo vtables, `operator
+new`, the `__cxa_*` family) is the next piece.
+
+Built like the compilers: C++14, `-Wall -Wextra -Werror -pedantic`, clang++
+on the Mac and g++ on the box, objects outside the checkout.
+
+## cl6x's streams
+
+cl6x compiles `cout << 1.5` almost entirely from STLport's headers: the
+sentry, `operator<<`, `num_put::put`, `sputc` and `sputn` are all in the
+program's own assembly, reading `cout`'s fields at the offsets the headers
+give them and reaching TI's compiled runtime through eleven names - the
+`cout` object itself, `ios_base::Init`, `locale`'s copy and destructor,
+`locale::_M_use_facet`, `_GetFacetId` for `num_put<char>`,
+`_M_throw_failure` - and through two vtables: the streambuf's (`sync`,
+`xsputn`, `_M_xsputnc`, `overflow`: slots 5, 11, 12, 13) and the facet's
+(`do_put` for bool, long, unsigned long, double, long double, long long,
+unsigned long long and `const void *`: slots 2 to 9). The runtime lays out
+`_ZSt4cout`, `_ZSt4cerr` and `_ZSt4clog` in its prelude as STLport's
+`basic_ostream<char>` over `basic_ios` (its offset at vptr-12; flags at +4,
+state +8, mask +20, precision +24, width +28, locale +32, fill +68, rdbuf
++72, tie +76 of that), each over a streambuf with no put area - so every
+character reaches `overflow` and every run `xsputn`, which are natives on the
+host's stdout or stderr - and one `num_put` facet whose virtuals format by
+STLport's own rules (`num_put_float.cpp`'s `%g` with a default precision of 6,
+fixed and scientific, the base, sign and case flags, and the width consumed
+with the fill after a sign or a `0x` under `internal`). `cin` is not there.
+
+Measured against clang's libc++ on a probe of forty insertions - widths,
+fills, the three adjustments, hex, oct, showbase, showpos, boolalpha, fixed,
+scientific, precision, 64-bit values, `cerr` - cl6x's assembly on the
+emulator prints byte for byte what the native program prints, and RIDE
+4.51's Sample (`cout << q << v << m` over its vector, matrix and quaternion
+templates) what RIDE's own cpp11 build prints. The oracle TI's own program
+cannot give: on the C6747 simulator CCS 7.4's Sample reaches `C$$EXIT` with
+an empty console, the stdio streambuf's `fwrite` never surfacing; the
+`-D_STD_IO_` build of the same source, which prints through `printf`, is the
+hard oracle for the values and agrees to the byte. `__cxa_vec_ctor`, which
+cl6x calls for a member array of class type, and its family (`new`, `cctor`,
+`dtor`, `cleanup`, `delete`, Itanium 3.3.3 as the C6000 EABI reads it - ctor
+and cctor answer the array) came with it; a constructor that throws inside
+one terminates here rather than unwinding the elements built so far.
+
+## Exceptions
+
+**The tables are TI's** (`lib/src/tdeh_pr_common.cpp` in the C6000 runtime).
+The index gives a function's compact unwind word, or the address of its table -
+the word, then scope descriptors, then a zero. A descriptor is two halves, the
+range's length and its offset in the function (+2), whose low bits tell a
+cleanup (0) from a catch (2); then the pad, and a catch's type. Kind 1 is an
+exception specification - a count of allowed types, then those, then a pad when
+the count's top bit says so; the compilers write a count of 0.
+
+**A throw walks the frames twice, as TI's runtime does.** Phase one scans each
+frame's catch descriptors for one whose type takes the exception - the barrier,
+remembered as the frame and the descriptor - and an uncaught exception
+terminates with nothing unwound. Phase two scans again, landing on every cleanup
+on the way and on the barrier's pad. A cleanup pad ends in `_Unwind_Resume`
+(TI's entry takes nothing and resumes the exception the landing recorded; the
+Itanium one is given it), which carries on from the descriptor after its own, in
+the frame the pad ran in - A15's, with B15 as the pad left it.
+
+**Landing is a return to the pad** with A15 the frame's, B15 as the frame's
+throwing call left it, B3 the pad, and for a catch A4 the exception; a cleanup
+gets nothing, as TI's does not, and ends with `__cxa_end_cleanup`. The frame
+above a (pc, fp) is read the way TI's unwinder would: the unwind word - inline,
+or the first of the table - is compact form pr3 with SP restored from A15, then
+the saved registers a word each below A15 in the bitmask's order, A15 first and
+B3 after the B-file registers. A pc with no entry ends the walk.
+
+**A thrown pointer** - the type_info's vtable says so - is matched by
+[except.handle]/3: the same pointee, a more qualified one, `void`, or a public
+base of a class pointee. What the handler receives is the pointer itself,
+adjusted to the base, which is what `__cxa_begin_catch` returns for a pointer on
+the real runtimes.
+
+The source comments that carried this were cut to the house cap of three lines
+on 2026-09-26; this section is their long form.
