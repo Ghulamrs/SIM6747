@@ -40,8 +40,8 @@ struct Host {
     Cpu6x &cpu;
     Memory &mem;
     uint32_t cioBuf = 0;
-    std::map<int, FILE *> files;
-    int nextFd = 3;
+    std::map<int, FILE *> files;       // by the target's descriptor
+    std::map<int, int> slots, slotOf;  // the host's own slot numbers, which open answers, and back
     explicit Host(Cpu6x &c) : cpu(c), mem(c.memory()) {}
 
     static uint16_t ld16(const uint8_t *p) { return uint16_t(p[0] | (p[1] << 8)); }
@@ -70,24 +70,42 @@ struct Host {
         std::string reply;
         switch (cmd) {
         case DTOPEN: {
+            // As CCS 5.5's simulator answers (measured): the file is kept under the descriptor the target
+            // names at parameter 0, every later request uses that one, and the answer is the host's own
+            // lowest free slot from 3, or -1 in 32 bits for a refusal.
             std::string path(data.c_str());
+            int fd = int16_t(ld16(parm));
             unsigned flags = ld16(parm + 2);
-            int fd = -1;
-            if (path == "stdout") fd = 1; else if (path == "stderr") fd = 2; else if (path == "stdin") fd = 0;
+            int answer = -1;
+            if (path == "stdout") answer = 1; else if (path == "stderr") answer = 2; else if (path == "stdin") answer = 0;
             else {
                 // rts file.h: O_RDONLY 0, O_WRONLY 1, O_RDWR 2, O_APPEND 8, O_CREAT 0x200, O_TRUNC 0x400, O_BINARY 0x8000
                 const char *mode = (flags & 3) == 0 ? "rb" : (flags & 8) ? ((flags & 3) == 2 ? "a+b" : "ab")
                                  : (flags & 0x400) || (flags & 0x200) ? ((flags & 3) == 2 ? "w+b" : "wb") : "r+b";
-                if (FILE *f = std::fopen(path.c_str(), mode)) { fd = nextFd++; files[fd] = f; }
+                if (FILE *f = std::fopen(path.c_str(), mode)) {
+                    std::map<int, FILE *>::iterator old = files.find(fd);
+                    if (old != files.end()) std::fclose(old->second);
+                    files[fd] = f;
+                    answer = 3;
+                    while (slots.count(answer)) answer++;
+                    slots[answer] = fd;
+                    slotOf[fd] = answer;
+                }
             }
-            st16(out, uint32_t(fd));
+            st32(out, uint32_t(answer));
             break;
         }
         case DTCLOSE: {
             int fd = int16_t(ld16(parm));
             int r = 0;
-            if (fd > 2) { FILE *f = fileOf(fd); r = f ? std::fclose(f) : -1; files.erase(fd); }
-            st16(out, uint32_t(r));
+            if (fd > 2) {
+                FILE *f = fileOf(fd);
+                r = f ? std::fclose(f) : -1;
+                files.erase(fd);
+                std::map<int, int>::iterator s = slotOf.find(fd);
+                if (s != slotOf.end()) { slots.erase(s->second); slotOf.erase(s); }
+            }
+            st32(out, uint32_t(r));
             break;
         }
         case DTWRITE: {
