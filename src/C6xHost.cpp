@@ -164,7 +164,7 @@ void traceLine(FILE *t, uint64_t k, const Cpu6x &cpu, bool landed) {
 
 int runMain(int argc, char **argv) {
     std::string path, tracePath;
-    bool bin = false, counts = false, haveEntry = false, landedView = true, haveCountFrom = false;
+    bool bin = false, counts = false, haveEntry = false, landedView = true, haveCountFrom = false, mainStatus = false;
     uint32_t countFrom = 0;
     uint32_t base = 0, entry = 0;
     uint64_t steps = ~uint64_t(0), maxCycles = ~uint64_t(0);
@@ -176,11 +176,12 @@ int runMain(int argc, char **argv) {
         else if (a == "--steps" && i + 1 < argc) steps = std::strtoull(argv[++i], nullptr, 10);
         else if (a == "--max-cycles" && i + 1 < argc) maxCycles = std::strtoull(argv[++i], nullptr, 10);
         else if (a == "-c") counts = true;
+        else if (a == "--main-status") mainStatus = true;
         else if (a == "--count-from" && i + 1 < argc) { haveCountFrom = true; countFrom = uint32_t(std::strtoul(argv[++i], nullptr, 16)); }
         else if (a.compare(0, 13, "--trace-view=") == 0) landedView = a.substr(13) != "issue";
         else path = a;
     }
-    if (path.empty()) { std::fprintf(stderr, "usage: vm6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--count-from ADDR] [--trace FILE] [--trace-view=issue] [--steps N] [--max-cycles N]\n"); return 2; }
+    if (path.empty()) { std::fprintf(stderr, "usage: vm6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--main-status] [--count-from ADDR] [--trace FILE] [--trace-view=issue] [--steps N] [--max-cycles N]\n"); return 2; }
     Image img;
     std::string why;
     if (!loadImage(path, img, why, bin, base)) { std::fprintf(stderr, "vm6747: %s\n", why.c_str()); return 1; }
@@ -213,8 +214,21 @@ int runMain(int argc, char **argv) {
     if (haveCountFrom) mainAt = countFrom;
     bool atMain = false;
     uint64_t mainCycle = 0, mainPackets = 0;
+    // --main-status: TI's boot calls exit(1) whatever main returned, and exit's cleanup calls reuse A4 before
+    // C$$EXIT; so the status is main's A4 where it returns, else exit's argument where it is entered.
+    uint32_t mainReturn = 0, mainFn = 0, exitFn = 0;
+    bool haveMainFn = findSymbol(img, { "main", "_main" }, mainFn), inMain = false, mainReturned = false;
+    bool haveExitFn = findSymbol(img, { "exit", "_exit" }, exitFn), exitCalled = false;
+    int mainValue = 0, exitValue = 0;
     cpu.beforeIssue = [&](uint32_t pc) -> bool {
-        if (haveMain && !atMain && pc == mainAt) { atMain = true; mainCycle = cpu.cycles(); mainPackets = cpu.packets(); }
+        if (haveMain && !atMain && pc == mainAt) {
+            atMain = true; mainCycle = cpu.cycles(); mainPackets = cpu.packets();
+        }
+        if (mainStatus && !inMain && haveMainFn && pc == mainFn) { inMain = true; mainReturn = cpu.landedReg(32 + 3); }
+        else if (mainStatus && inMain && !mainReturned && pc == mainReturn) {
+            mainReturned = true; mainValue = int(cpu.landedReg(4));
+        }
+        if (mainStatus && haveExitFn && !exitCalled && pc == exitFn) { exitCalled = true; exitValue = int(cpu.landedReg(4)); }
         if (haveExit && pc == exitAt) { exited = true; return false; }
         if (haveCio && pc == cioAt && host.cioBuf) host.serve();
         return true;
@@ -237,7 +251,7 @@ int runMain(int argc, char **argv) {
     std::fflush(stdout);
     if (trace) { std::fprintf(trace, "# END steps=%llu\n", static_cast<unsigned long long>(k)); std::fclose(trace); }
     int status = 0;
-    if (exited) status = int(cpu.reg(4));
+    if (exited) status = mainReturned ? mainValue : exitCalled ? exitValue : int(cpu.reg(4));
     else if (cpu.stopped()) { std::fprintf(stderr, "vm6747: %s\n", cpu.stopReason().c_str()); status = 70; }
     else if (k >= steps || cpu.cycles() >= maxCycles) { std::fprintf(stderr, "vm6747: stopped after %llu steps, %llu cycles, at 0x%08x (%s)\n",
         static_cast<unsigned long long>(k), static_cast<unsigned long long>(cpu.cycles()), cpu.pc(), img.where(cpu.pc()).c_str()); status = 71; }

@@ -6,7 +6,7 @@ runs what TI's tools built - a cl6x/lnk6x `.out` (ELF or COFF), a hex6x image (T
 Motorola-S) or a raw binary - with TI's own boot code and rts6740, held to the CCS 5.5 C6747
 simulator through `oracle/`.
 
-    vm6747 --run prog.out [-c] [--trace FILE] [--trace-view=issue] [--steps N] [--max-cycles N]
+    vm6747 --run prog.out [-c] [--main-status] [--trace FILE] [--trace-view=issue] [--steps N] [--max-cycles N]
     vm6747 --run image.bin --bin ADDR [--entry ADDR]
     vm6747 --dis prog.out [--all]        vm6747 --dis-words ADDR WORD...
 
@@ -16,7 +16,7 @@ simulator through `oracle/`.
   loads and stores issuing in E1 with memory reached in E3, results landing as their delay slots
   end, branches after five - the semantics of every mnemonic, and the SPLOOP buffer.
 - `C6xMem.*`: the C6747 memory map. `C6xHost.cpp`: CIO at `C$$IO$$`, the stop at `C$$EXIT`
-  (A4 is the status), `-c` cycles from `main` as `cycle.CPU` counts them, `--trace` in trace.js's
+  (A4 is the status; with `--main-status`, `main`'s return or `exit`'s argument - TI's boot calls `exit(1)` after `main` and `exit`'s cleanup reuses A4), `-c` cycles from `main` as `cycle.CPU` counts them, `--trace` in trace.js's
   form with in-flight results shown landed, as a halted simulator shows them.
 - Not modelled: the memory system (so `cycle.Total` is not matched, only `cycle.CPU`), the
   cross-path stall, interrupts and exceptions.
