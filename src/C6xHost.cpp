@@ -103,9 +103,20 @@ struct Host {
             int fd = int16_t(ld16(parm));
             unsigned count = ld16(parm + 2);
             FILE *f = fileOf(fd);
-            std::string buf(count, '\0');
-            size_t r = f ? std::fread(&buf[0], 1, count, f) : 0;
-            buf.resize(r);
+            std::string buf;
+            if (f == stdin) {
+                // A line at a time, as a terminal gives it: a conversation on stdin (Shalimar's debugger
+                // session) sends one line and waits for the answer, so a read must not wait for count bytes.
+                int c;
+                while (buf.size() < count && (c = std::getc(f)) != EOF) {
+                    buf.push_back(char(c));
+                    if (c == '\n') break;
+                }
+            } else {
+                buf.assign(count, '\0');
+                buf.resize(f ? std::fread(&buf[0], 1, count, f) : 0);
+            }
+            size_t r = buf.size();
             reply = buf;
             st16(out, f ? uint32_t(r) : 0xffffu);
             break;
