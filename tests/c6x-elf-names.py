@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """c6x-elf-names.py VM - a fault or listing names a function by its own name: a minimal C6000 ELF whose one
 function start also carries TI's __TI_exidx_linkto_scn_start_40 (first in the symbol table, as lnk6x writes
-it) and a $C$L1 temporary; vm6747 --dis must label the address 'malloc'."""
+it) and a $C$L1 temporary; sim6747 --dis must label the address 'malloc'."""
 import struct, subprocess, sys, tempfile, os
 
 def elf(path):

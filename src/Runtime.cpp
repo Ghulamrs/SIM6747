@@ -360,7 +360,7 @@ void Runtime::numPut(Cpu &c, const std::string &text, bool hexPrefixed) {
 // scope in the tables asks for, and what the hosts' pads do.
 void Runtime::terminate(Cpu &cpu, const char *why) {
     std::fflush(stdout);
-    if (why != nullptr) std::fprintf(stderr, "vm6747: terminate called: %s\n", why);
+    if (why != nullptr) std::fprintf(stderr, "sim6747: terminate called: %s\n", why);
     cpu.exitWith(134);
     // exitWith stops the run; nothing after a terminate may continue.
     std::exit(134);
@@ -953,7 +953,7 @@ bool Runtime::call(const std::string &n, Cpu &c) {
         uint32_t sig = arg(c, 0);
         uint32_t h = sig < 32 ? handlers_[sig] : 0;
         if (h == 1) { ret(c, 0); return true; }                       // SIG_IGN
-        if (h == 0) { std::fflush(stdout); std::fprintf(stderr, "vm6747: signal %u\n", sig); c.exitWith(128 + static_cast<int>(sig)); return true; }
+        if (h == 0) { std::fflush(stdout); std::fprintf(stderr, "sim6747: signal %u\n", sig); c.exitWith(128 + static_cast<int>(sig)); return true; }
         handlers_[sig] = 0;                                           // reset, as SIGTERM's default does
         c.callback(h, sig, 0);
         ret(c, 0);

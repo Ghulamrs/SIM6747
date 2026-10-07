@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """compare-dis.py DIS6X.dis VM.dis [--max N]
 
-Holds vm6747 --dis to TI's dis6x on the same file, instruction by instruction, keyed by address. Both
+Holds sim6747 --dis to TI's dis6x on the same file, instruction by instruction, keyed by address. Both
 listings are read loosely - an address, the instruction word (or half), the text - and the text compared
 in a normal form: case and spacing dropped, every number read as its value, '||' kept apart. Prints the
 first disagreements and a summary by mnemonic, so a wrong format shows as a block of one mnemonic.

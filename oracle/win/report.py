@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""report.py SHIP - oracle/ship/win-calib/out (vm6747sim on the Windows box) held to CCS 5.5: each image's output
+"""report.py SHIP - oracle/ship/win-calib/out (sim6747 on the Windows box) held to CCS 5.5: each image's output
 against the oracle's, and its cycle count against cycle.CPU - fresh from the box when calibrate.sh ran with --ccs,
 otherwise the stored count (res/ for the 49, img822/results*.txt for cl6x 8.2.2's)."""
 import os, re, sys, statistics
@@ -37,7 +37,7 @@ for n in sorted(ms):
     r = sc / ref if sc and ref else None
     if r: ratios.append(r)
     rows.append('%-42s %-5s %9s %9s %7s %6d ms' % (n, 'MATCH' if ok else 'DIFF', sc, ref, '%.4f' % r if r else '-', ms[n]))
-print('%-42s %-5s %9s %9s %7s' % ('image', 'out', 'vm6747sim', 'cycle.CPU', 'ratio'))
+print('%-42s %-5s %9s %9s %7s' % ('image', 'out', 'sim6747', 'cycle.CPU', 'ratio'))
 print('\n'.join(rows))
 src = 'fresh from the box' if fresh else 'stored'
 print('\n%d of %d match CCS 5.5\'s output; cycles against %s cycle.CPU: median %.4f, range %.4f-%.4f' %

@@ -5,8 +5,8 @@ table has to change; the build never runs it.
 
 The encodings are facts of TI's instruction set (SPRUFE8, appendices C–H). They are collected from the
 opcode tables in GNU binutils (`include/opcode/tic6x-*.h`, GPL-3.0), which state those facts
-field by field. The tables are read here and their contents written out in vm6747's own form. No
-binutils code is compiled into vm6747. The result is held, word for word, to TI's `dis6x`
+field by field. The tables are read here and their contents written out in sim6747's own form. No
+binutils code is compiled into sim6747. The result is held, word for word, to TI's `dis6x`
 (`oracle/compare-dis.py`).
 
     # with a binutils source tree at $B (e.g. from Ubuntu's binutils-source package)

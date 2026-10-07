@@ -3,8 +3,8 @@
 # 2026-10-07): on Windows a file opened without O_BINARY is the C runtime's text mode, LF written as CR LF and
 # CR LF read back as LF; on Linux nothing is translated. Run from the repository root; needs perl.
 set -u
-VM=${VM:-./vm6747.exe}
-case "$VM" in /*|[A-Za-z]:*) ;; *) VM=$(pwd)/$VM ;; esac
+SIM6747=${SIM6747:-./sim6747.exe}
+case "$SIM6747" in /*|[A-Za-z]:*) ;; *) SIM6747=$(pwd)/$SIM6747 ;; esac
 T=${TMPDIR:-/tmp}/c6x-cio.$$
 mkdir -p "$T" && trap 'rm -rf "$T"' EXIT
 case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) win=1 ;; *) win=0 ;; esac
@@ -44,7 +44,7 @@ $f .= "\0" x ($off - length $f) . join('', map { pack('V10', @$_) } @sh);
 open my $o, '>:raw', $ARGV[0] or die; print $o $f; close $o;
 PL
 printf 'a\r\nb\r\n' > "$T/r.txt"
-(cd "$T" && "$VM" --run cio.out -c --trace trace.txt > out.txt 2>&1)
+(cd "$T" && "$SIM6747" --run cio.out -c --trace trace.txt > out.txt 2>&1)
 # A3 is the answer; A4 the first data bytes, held for the two reads and only as far as each answered.
 got=$(awk -v w=$win '$1 == "S" && $3 == "80001060" { n++; d = n == 6 ? " " $8 : n == 9 ? " " substr($8, w ? 7 : 5) : "";
       printf "%s%s ", $7, d }' "$T/trace.txt" 2>/dev/null)

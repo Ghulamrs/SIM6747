@@ -1,5 +1,5 @@
-{"name": "vm6747sim",
- "version": "1.0",
- "banner": "©2026 G. R. Akhtar - VM6747-sim (C6747 simulator) 1.0",
+{"name": "sim6747",
+ "version": "1.1",
+ "banner": "©2026 G. R. Akhtar - SIM6747 (C6747 simulator) 1.1",
  "dirs": ["src", "msvc"],
  "files": []}

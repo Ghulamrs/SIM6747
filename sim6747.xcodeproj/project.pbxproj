@@ -50,7 +50,7 @@
 		C12A2821733BD43F315FE82A /* src/Isa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Isa.h; sourceTree = "<group>"; };
 		18BF32A88DD963E3BC2BF792 /* src/Program.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Program.h; sourceTree = "<group>"; };
 		F302D82DAEAF140D47E6C1D9 /* src/Runtime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Runtime.h; sourceTree = "<group>"; };
-		A6D16C1F5B156175C01B1B5A /* vm6747sim.exe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vm6747sim.exe; sourceTree = BUILT_PRODUCTS_DIR; };
+		A6D16C1F5B156175C01B1B5A /* sim6747.exe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sim6747.exe; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,7 +108,7 @@
 		ACD5DA66D1BA6D34C9E0F52B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A6D16C1F5B156175C01B1B5A /* vm6747sim.exe */,
+				A6D16C1F5B156175C01B1B5A /* sim6747.exe */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -116,7 +116,7 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2564CB7A74E42A161DBF03ED /* vm6747sim.exe */ = {
+		2564CB7A74E42A161DBF03ED /* sim6747.exe */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DC50E7C2D0FB9D5E09452A0B;
 			buildPhases = (
@@ -128,9 +128,9 @@
 			);
 			dependencies = (
 			);
-			name = vm6747sim.exe;
-			productName = vm6747sim.exe;
-			productReference = A6D16C1F5B156175C01B1B5A /* vm6747sim.exe */;
+			name = sim6747.exe;
+			productName = sim6747.exe;
+			productReference = A6D16C1F5B156175C01B1B5A /* sim6747.exe */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -154,7 +154,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2564CB7A74E42A161DBF03ED /* vm6747sim.exe */,
+				2564CB7A74E42A161DBF03ED /* sim6747.exe */,
 			);
 		};
 /* End PBXProject section */
@@ -215,7 +215,7 @@
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_NAME = vm6747sim.exe;
+				PRODUCT_NAME = sim6747.exe;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src";
 				WARNING_CFLAGS = (
@@ -241,7 +241,7 @@
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_NAME = vm6747sim.exe;
+				PRODUCT_NAME = sim6747.exe;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src";
 				WARNING_CFLAGS = (
@@ -267,7 +267,7 @@
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_NAME = vm6747sim.exe;
+				PRODUCT_NAME = sim6747.exe;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src";
 				WARNING_CFLAGS = (
@@ -293,7 +293,7 @@
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_NAME = vm6747sim.exe;
+				PRODUCT_NAME = sim6747.exe;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src";
 				WARNING_CFLAGS = (

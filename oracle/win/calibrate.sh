@@ -1,5 +1,5 @@
 #!/bin/sh
-# oracle/win/calibrate.sh [--ccs] - vm6747sim calibrated on the Windows box, from this checkout.
+# oracle/win/calibrate.sh [--ccs] - sim6747 calibrated on the Windows box, from this checkout.
 # Builds this checkout's src/ there with msvc/build.cmd (Visual Studio 2022), runs every image in oracle/ship -
 # the 49 (img, cpp11img) and the 32 from cl6x 8.2.2 (img822/img) - and brings the outputs and cycle counts back
 # to oracle/ship/win-calib/, where they are held to CCS 5.5's: its stored results, or with --ccs a fresh run of
@@ -21,7 +21,7 @@ cp -R "$HERE/src" "$HERE/msvc" "$WORK/calib/"
 cat > "$WORK/calib/run.ps1" <<'PS'
 param([int]$Ccs = 0)
 $W = "C:\simrev\calib"; $Out = "$W\out"; New-Item -ItemType Directory -Force $Out | Out-Null
-$Sim = "$W\vm6747.exe"; $Dss = "C:\ti\ccsv5\ccs_base\scripting\bin\dss.bat"
+$Sim = "$W\sim6747.exe"; $Dss = "C:\ti\ccsv5\ccs_base\scripting\bin\dss.bat"
 $Res = "$Out\results.txt"; Set-Content $Res ""
 foreach ($img in (Get-ChildItem "$W\imgs\*.out" | Sort-Object Name)) {
   $n = $img.BaseName; $o = "$Out\$n"

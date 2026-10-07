@@ -1,8 +1,8 @@
-// vm6747 --dis: the machine code of a C6000 image listed as TI's assembler would write it, a fetch packet at a
+// sim6747 --dis: the machine code of a C6000 image listed as TI's assembler would write it, a fetch packet at a
 // time, so that the decoder can be held to TI's dis6x on the same file (oracle/compare-dis.py).
-//   vm6747 --dis file.out|file.obj|image.hex [--all]       code sections, or with --all every loaded byte
-//   vm6747 --dis --bin ADDR file.bin
-//   vm6747 --dis-words ADDR WORD...                        words given on the command line, from ADDR
+//   sim6747 --dis file.out|file.obj|image.hex [--all]       code sections, or with --all every loaded byte
+//   sim6747 --dis --bin ADDR file.bin
+//   sim6747 --dis-words ADDR WORD...                        words given on the command line, from ADDR
 
 #include "C6xDis.h"
 #include "C6xImage.h"
@@ -38,7 +38,7 @@ static void listRange(const Image &img, uint32_t from, uint32_t to) {
 int disMain(int argc, char **argv) {
     // argv[0] is "--dis" or "--dis-words"
     if (std::strcmp(argv[0], "--dis-words") == 0) {
-        if (argc < 3) { std::fprintf(stderr, "usage: vm6747 --dis-words ADDR WORD...\n"); return 2; }
+        if (argc < 3) { std::fprintf(stderr, "usage: sim6747 --dis-words ADDR WORD...\n"); return 2; }
         Image img;
         Section s; s.name = ".words"; s.addr = static_cast<uint32_t>(std::strtoul(argv[1], nullptr, 16)); s.code = true;
         for (int i = 2; i < argc; i++) {
@@ -58,10 +58,10 @@ int disMain(int argc, char **argv) {
         else if (std::strcmp(argv[i], "--bin") == 0 && i + 1 < argc) { bin = true; base = static_cast<uint32_t>(std::strtoul(argv[++i], nullptr, 16)); }
         else path = argv[i];
     }
-    if (path.empty()) { std::fprintf(stderr, "usage: vm6747 --dis [--all] [--bin ADDR] file\n"); return 2; }
+    if (path.empty()) { std::fprintf(stderr, "usage: sim6747 --dis [--all] [--bin ADDR] file\n"); return 2; }
     Image img;
     std::string why;
-    if (!loadImage(path, img, why, bin, base)) { std::fprintf(stderr, "vm6747: %s\n", why.c_str()); return 1; }
+    if (!loadImage(path, img, why, bin, base)) { std::fprintf(stderr, "sim6747: %s\n", why.c_str()); return 1; }
     std::printf("; %s: %s image, %zu sections", path.c_str(), img.format.c_str(), img.sections.size());
     if (img.hasEntry) std::printf(", entry 0x%08x", img.entry);
     std::printf("\n");

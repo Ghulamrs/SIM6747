@@ -1,11 +1,11 @@
-// vm6747 --run: a C6000 program as TI's tools built it - a cl6x/lnk6x .out, a hex6x image, a raw binary -
+// sim6747 --run: a C6000 program as TI's tools built it - a cl6x/lnk6x .out, a hex6x image, a raw binary -
 // loaded into the C6747's memory and run on the machine-code CPU from its entry point, as CCS 5.5's simulator
 // runs it: TI's own boot code and rts6740 execute, and what they ask of the debugger is answered here.
 //   C$$IO$$   CIO: the target's runtime has put a request in _CIOBUF_ (rts trgmsg.c's writemsg) - open, close,
 //             read, write, lseek, unlink, rename, getenv, time, clock - and waits for the reply in the same buffer
 //   C$$EXIT   exit and abort end there: the run stops, A4 is the status
 //
-//   vm6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--trace FILE] [--steps N] [--max-cycles N]
+//   sim6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--trace FILE] [--steps N] [--max-cycles N]
 //   -c          on exit, a line on stderr: the CPU cycles and packets from main (or --count-from ADDR), as TI's
 //               simulator counts once its load has run to main, and the cycles from the entry point
 //   --trace F   after every execute packet, the PC, A0-B31, the control registers and the cycle count - the
@@ -49,7 +49,7 @@ enum Cio : uint8_t {
 
 // A host file by its own descriptor, as TI's host keeps one. On Windows CCS 5.5's host translates a file
 // opened without O_BINARY as the Microsoft C runtime's text mode does (measured, see openFile); its Linux
-// host translates nothing. Each build of vm6747sim answers as TI's host on that system does.
+// host translates nothing. Each build of sim6747 answers as TI's host on that system does.
 #ifdef _WIN32
 int openFile(const char *path, unsigned flags) {
     // A text file is the C runtime's _O_TEXT: LF written as CR LF, CR LF read as LF, a read ending at ^Z.
@@ -256,15 +256,15 @@ int runMain(int argc, char **argv) {
         else if (a.compare(0, 13, "--trace-view=") == 0) landedView = a.substr(13) != "issue";
         else path = a;
     }
-    if (path.empty()) { std::fprintf(stderr, "usage: vm6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--main-status] [--count-from ADDR] [--trace FILE] [--trace-view=issue] [--steps N] [--max-cycles N]\n"); return 2; }
+    if (path.empty()) { std::fprintf(stderr, "usage: sim6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--main-status] [--count-from ADDR] [--trace FILE] [--trace-view=issue] [--steps N] [--max-cycles N]\n"); return 2; }
     Image img;
     std::string why;
-    if (!loadImage(path, img, why, bin, base)) { std::fprintf(stderr, "vm6747: %s\n", why.c_str()); return 1; }
+    if (!loadImage(path, img, why, bin, base)) { std::fprintf(stderr, "sim6747: %s\n", why.c_str()); return 1; }
     gImage = &img;
     Memory mem;
     for (const Section &s : img.sections) {
         if (!mem.mapped(s.addr) || (s.size && !mem.mapped(s.addr + s.size - 1))) {
-            std::fprintf(stderr, "vm6747: section %s at 0x%08x (%u bytes) is not in the C6747's memory\n", s.name.c_str(), s.addr, s.size);
+            std::fprintf(stderr, "sim6747: section %s at 0x%08x (%u bytes) is not in the C6747's memory\n", s.name.c_str(), s.addr, s.size);
             return 1;
         }
         mem.writeBytes(s.addr, s.bytes.data(), s.bytes.size());
@@ -272,7 +272,7 @@ int runMain(int argc, char **argv) {
     Cpu6x cpu(mem);
     cpu.whereFn = whereIn;
     if (!haveEntry) {
-        if (!img.hasEntry) { std::fprintf(stderr, "vm6747: %s has no entry point: give one with --entry ADDR\n", path.c_str()); return 1; }
+        if (!img.hasEntry) { std::fprintf(stderr, "sim6747: %s has no entry point: give one with --entry ADDR\n", path.c_str()); return 1; }
         entry = img.entry;
     }
     cpu.setPc(entry);
@@ -312,7 +312,7 @@ int runMain(int argc, char **argv) {
     FILE *trace = nullptr;
     if (!tracePath.empty()) {
         trace = std::fopen(tracePath.c_str(), "w");
-        if (!trace) { std::fprintf(stderr, "vm6747: cannot write %s\n", tracePath.c_str()); return 1; }
+        if (!trace) { std::fprintf(stderr, "sim6747: cannot write %s\n", tracePath.c_str()); return 1; }
         traceHeader(trace);
         std::fprintf(trace, "# EXIT %08x\n", haveExit ? exitAt : 0xffffffffu);
         traceLine(trace, 0, cpu, landedView);
@@ -327,8 +327,8 @@ int runMain(int argc, char **argv) {
     if (trace) { std::fprintf(trace, "# END steps=%llu\n", static_cast<unsigned long long>(k)); std::fclose(trace); }
     int status = 0;
     if (exited) status = mainReturned ? mainValue : exitCalled ? exitValue : int(cpu.reg(4));
-    else if (cpu.stopped()) { std::fprintf(stderr, "vm6747: %s\n", cpu.stopReason().c_str()); status = 70; }
-    else if (k >= steps || cpu.cycles() >= maxCycles) { std::fprintf(stderr, "vm6747: stopped after %llu steps, %llu cycles, at 0x%08x (%s)\n",
+    else if (cpu.stopped()) { std::fprintf(stderr, "sim6747: %s\n", cpu.stopReason().c_str()); status = 70; }
+    else if (k >= steps || cpu.cycles() >= maxCycles) { std::fprintf(stderr, "sim6747: stopped after %llu steps, %llu cycles, at 0x%08x (%s)\n",
         static_cast<unsigned long long>(k), static_cast<unsigned long long>(cpu.cycles()), cpu.pc(), img.where(cpu.pc()).c_str()); status = 71; }
     // count: from main, as cycle.CPU reads after TI's loadProgram; entry: from the entry point, the boot included
     if (counts)

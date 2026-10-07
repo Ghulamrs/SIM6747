@@ -2,7 +2,7 @@
 """gen-words.py [packets] [seed] > words.asm
 
 The decoder's oracle corpus: fetch packets of pseudo-random instruction words for TI's dis6x to
-disassemble, so that vm6747 --dis-words can be held to dis6x's reading of the same words, word for
+disassemble, so that sim6747 --dis-words can be held to dis6x's reading of the same words, word for
 word. About a third of the packets carry a compact-instruction header (the eighth word's top nibble
 0b1110) with a random layout, expansion and p-bit field, so the 16-bit formats are covered too. The
 seed is fixed, so the corpus and its expected disassembly are reproducible.

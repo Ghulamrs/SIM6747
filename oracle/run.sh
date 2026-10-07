@@ -3,10 +3,10 @@
 # Ships the oracle kit to the box, runs TI's CCS 5.5 tools there (remote/probe.sh or probe.cmd), and
 # brings the results back to oracle/results/<box>/: the inventory, dis6x's reading of the decoder corpus,
 # and for each program its .out, map, dis6x and ofd6x listings, hex6x images, the simulator's
-# step-by-step trace and its CIO output. vm6747 is then held to these (oracle/compare.sh). C6747.cmd and the two ccxml are in oracle/c6747/.
+# step-by-step trace and its CIO output. sim6747 is then held to these (oracle/compare.sh). C6747.cmd and the two ccxml are in oracle/c6747/.
 #
 #   LINUX  ec2-user@52.202.164.123        KEY  ~/Documents/_NEW_/myMorningWalk.pem
-#   WIN    GRA@192.168.100.84             WINDIR C:/Users/GRA/Documents/VM6747-sim
+#   WIN    GRA@192.168.100.84             WINDIR C:/Users/GRA/Documents/SIM6747
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 BOX=${1:-both}
@@ -14,9 +14,9 @@ STEPS=${2:-20000}
 LINUX=${LINUX:-ec2-user@52.202.164.123}
 KEY=${KEY:-$HOME/Documents/_NEW_/myMorningWalk.pem}
 WIN=${WIN:-GRA@192.168.100.84}
-WINDIR=${WINDIR:-C:/Users/GRA/Documents/VM6747-sim}
+WINDIR=${WINDIR:-C:/Users/GRA/Documents/SIM6747}
 C6747=$HERE/c6747
-WORK=${TMPDIR:-/tmp}/vm6747-oracle.$$
+WORK=${TMPDIR:-/tmp}/sim6747-oracle.$$
 trap 'rm -rf "$WORK"' EXIT
 
 mkdir -p "$WORK/oracle/programs"
@@ -29,11 +29,11 @@ python3 "$HERE/gen-words.py" 4096 6747 > "$WORK/oracle/words.asm"
 
 linux() {
     echo "== linux: $LINUX"
-    ssh -i "$KEY" -o ConnectTimeout=15 "$LINUX" "rm -rf ~/vm6747-oracle && mkdir -p ~/vm6747-oracle" || return 1
-    scp -q -i "$KEY" "$WORK/oracle.tgz" "$LINUX:vm6747-oracle/" || return 1
-    ssh -i "$KEY" "$LINUX" "cd ~/vm6747-oracle && tar xzf oracle.tgz && sh oracle/probe.sh $STEPS && tar czf out.tgz -C oracle out" || return 1
+    ssh -i "$KEY" -o ConnectTimeout=15 "$LINUX" "rm -rf ~/sim6747-oracle && mkdir -p ~/sim6747-oracle" || return 1
+    scp -q -i "$KEY" "$WORK/oracle.tgz" "$LINUX:sim6747-oracle/" || return 1
+    ssh -i "$KEY" "$LINUX" "cd ~/sim6747-oracle && tar xzf oracle.tgz && sh oracle/probe.sh $STEPS && tar czf out.tgz -C oracle out" || return 1
     rm -rf "$HERE/results/linux" && mkdir -p "$HERE/results/linux"
-    scp -q -i "$KEY" "$LINUX:vm6747-oracle/out.tgz" "$WORK/linux.tgz" && tar xzf "$WORK/linux.tgz" -C "$HERE/results/linux" --strip-components 1
+    scp -q -i "$KEY" "$LINUX:sim6747-oracle/out.tgz" "$WORK/linux.tgz" && tar xzf "$WORK/linux.tgz" -C "$HERE/results/linux" --strip-components 1
 }
 # The Windows box's ssh lands in PowerShell, so every step is handed to cmd in one double-quoted
 # string: PowerShell 5 does not parse '&&' itself.

@@ -1,6 +1,6 @@
-# oracle — vm6747 held to TI's CCS 5.5 simulator
+# oracle — sim6747 held to TI's CCS 5.5 simulator
 
-vm6747's machine-code path (loading a cl6x `.out`, `.bin` or hex image and running TI's own rts6740)
+sim6747's machine-code path (loading a cl6x `.out`, `.bin` or hex image and running TI's own rts6740)
 is built clean-room from TI's public documents and checked here, black-box, against TI's own tools
 on the two boxes. Nothing of TI's is disassembled or copied; its tools are only run.
 

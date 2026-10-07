@@ -56,7 +56,7 @@ std::string Cpu::where(uint32_t pc) const {
 }
 
 void Cpu::fault(const std::string &what) {
-    std::fprintf(stderr, "vm6747: fault at %s, cycle %llu: %s\n", where(pc_).c_str(),
+    std::fprintf(stderr, "sim6747: fault at %s, cycle %llu: %s\n", where(pc_).c_str(),
                  static_cast<unsigned long long>(cycle_), what.c_str());
     std::fprintf(stderr, "        A4=0x%x B4=0x%x A15=0x%x B3=0x%x B15=0x%x\n", r_[A4], r_[B4], r_[A15], r_[B3], r_[B15]);
     std::exit(70);

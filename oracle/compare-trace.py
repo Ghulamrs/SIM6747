@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """compare-trace.py TI.trace VM.trace [--from=PC] [--max=N] [--ignore=A,B,...] [--window=N]
 
-Holds vm6747's --trace to trace.js's on TI's simulator. The two step differently: TI's asmStep moves one
-cycle (a NOP 5 is six lines at one PC), vm6747 one execute packet with its holds. So TI's trace is first
+Holds sim6747's --trace to trace.js's on TI's simulator. The two step differently: TI's asmStep moves one
+cycle (a NOP 5 is six lines at one PC), sim6747 one execute packet with its holds. So TI's trace is first
 collapsed to the first line of each run of one PC, and the two are then walked together: at a PC both are at,
 the registers both name are compared; where the PCs differ, the side that reaches the other's PC sooner
 (within --window packets) is advanced - a granularity difference cannot show as a register difference, only
 a real one can. Values are compared as 32-bit words (DSS may sign-extend a negative one to 16 digits).
 --from starts both at the first visit of that PC (main, say). Exit status 0 when nothing disagrees and
 neither path leaves the other.
-Defaults ignore CYC and the control registers vm6747 does not yet model as the simulator does.
+Defaults ignore CYC and the control registers sim6747 does not yet model as the simulator does.
 """
 import sys
 

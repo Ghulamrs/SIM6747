@@ -2,8 +2,8 @@
 # tests/c6x-dis.sh - the machine-code decoder on words whose reading is worked out by hand from SPRUFE8's
 # formats; the full check is oracle/compare-dis.py against TI's dis6x. Run from the repository root.
 set -u
-VM=${VM:-./vm6747.exe}
-got=$("$VM" --dis-words 0 00000000 00008000 018002a8 000c0362 02906078 01bc42e6 00000000 00000000 | sed 's/^[0-9a-f]* *[0-9a-f]*  *//')
+SIM6747=${SIM6747:-./sim6747.exe}
+got=$("$SIM6747" --dis-words 0 00000000 00008000 018002a8 000c0362 02906078 01bc42e6 00000000 00000000 | sed 's/^[0-9a-f]* *[0-9a-f]*  *//')
 want='NOP 1
 NOP 5
 MVK.S1 5,A3

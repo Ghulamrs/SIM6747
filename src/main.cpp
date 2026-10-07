@@ -1,5 +1,5 @@
-// vm6747 - run C6000 assembly as c90 and cpp11 emit it for -arch tms6747:
-//   vm6747 [-t] [-m megabytes] file.s|directory [more ...] [-- args]
+// sim6747 - run C6000 assembly as c90 and cpp11 emit it for -arch tms6747:
+//   sim6747 [-t] [-m megabytes] file.s|directory [more ...] [-- args]
 // The files are assembled together, the C library is provided natively, and the exit status is main's return or exit's argument; -t traces every instruction.
 
 #include "Asm.h"
@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
         if (a == "-p") { profile = true; continue; }
         if (a == "-m" && i + 1 < argc) { layout.memoryBytes = static_cast<uint32_t>(std::atoi(argv[++i])) << 20; continue; }
         if (a == "-h" || a == "--help") {
-            std::printf("usage: vm6747 [-t] [-c] [-p] [-m megabytes] file.s ... [-- args]\n"
+            std::printf("usage: sim6747 [-t] [-c] [-p] [-m megabytes] file.s ... [-- args]\n"
                         "  -c  on exit, a line on stderr: the cycles from main, as TI's simulator\n"
                         "      counts them (cycle.CPU: no memory stalls), and the packets and\n"
                         "      native library calls among them\n"
@@ -98,29 +98,29 @@ int main(int argc, char **argv) {
             return 0;
         }
         if (a == "--version") {
-            std::printf("\xc2\xa9" "2026 G. R. Akhtar - VM6747-sim (C6747 simulator) 1.0\n");
+            std::printf("\xc2\xa9" "2026 G. R. Akhtar - SIM6747 (C6747 simulator) 1.1\n");
             return 0;
         }
         if (isDirectory(a)) {
             std::vector<std::string> inside = assemblyIn(a);
-            if (inside.empty()) { std::fprintf(stderr, "vm6747: no .s or .asm files in %s\n", a.c_str()); return 2; }
+            if (inside.empty()) { std::fprintf(stderr, "sim6747: no .s or .asm files in %s\n", a.c_str()); return 2; }
             for (const std::string &f : inside) files.push_back(f);
             continue;
         }
         files.push_back(a);
     }
-    if (files.empty()) { std::fprintf(stderr, "vm6747: no input\n"); return 2; }
+    if (files.empty()) { std::fprintf(stderr, "sim6747: no input\n"); return 2; }
 
     layout.prelude = Runtime::prelude();
 
     Program prog;
     std::string error;
     if (!assemble(files, layout, Runtime::names(), prog, error)) {
-        std::fprintf(stderr, "vm6747: %s\n", error.c_str());
+        std::fprintf(stderr, "sim6747: %s\n", error.c_str());
         return 1;
     }
     std::map<std::string, uint32_t>::const_iterator m = prog.symbols.find("main");
-    if (m == prog.symbols.end()) { std::fprintf(stderr, "vm6747: no main\n"); return 1; }
+    if (m == prog.symbols.end()) { std::fprintf(stderr, "sim6747: no main\n"); return 1; }
 
     Runtime rt;
     Cpu cpu(prog, rt);

@@ -1,5 +1,5 @@
 #!/bin/sh
-# tests/oracle-compare-dis.sh - compare-dis.py reads dis6x's spellings as the same instructions as vm6747's:
+# tests/oracle-compare-dis.sh - compare-dis.py reads dis6x's spellings as the same instructions as sim6747's:
 # a branch target written $C$L25 (PC+160 = 0x...), a scaled offset *B7[4], *B4 for *+B4(0), MV and ZERO for
 # the ADD/OR/SUB/MVK they stand for, and ||^ for an SPMASKed instruction. One real difference must still show.
 set -u

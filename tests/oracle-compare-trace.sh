@@ -1,7 +1,7 @@
 #!/bin/sh
-# tests/oracle-compare-trace.sh - the kit's trace comparison on two small traces made to look like TI's and vm6747's:
+# tests/oracle-compare-trace.sh - the kit's trace comparison on two small traces made to look like TI's and sim6747's:
 # TI's steps a cycle at a time (its NOP 3 three lines at one PC) and writes a negative register as 16 digits;
-# vm6747's an execute packet at a time. The two agree; then one register is made to differ, and must be found.
+# sim6747's an execute packet at a time. The two agree; then one register is made to differ, and must be found.
 set -u
 D=${TMPDIR:-/tmp}/oct.$$; mkdir -p "$D"; trap 'rm -rf "$D"' EXIT
 H='# REGS PC A0 A1 CYC'

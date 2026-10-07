@@ -1,7 +1,7 @@
 // dss trace.js <ccxml> <program.out> <trace.txt> <cio.txt> [steps] [timeout ms]
 // The oracle trace: TI's CCS 5.5 simulator steps a program one execute packet at a time from its
 // load entry, and after every step writes the PC, all 64 general registers, the control registers it
-// will give, and the CPU cycle count - the state vm6747 --trace-state writes, so the two diff line by line.
+// will give, and the CPU cycle count - the state sim6747 --trace-state writes, so the two diff line by line.
 // The program's output through CIO goes to <cio.txt>. Nothing in the target is changed.
 importPackage(Packages.com.ti.debug.engine.scripting);
 importPackage(Packages.com.ti.ccstudio.scripting.environment);
