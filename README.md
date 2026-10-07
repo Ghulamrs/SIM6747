@@ -17,7 +17,9 @@ simulator through `oracle/`.
   end, branches after five - the semantics of every mnemonic, and the SPLOOP buffer.
 - `C6xMem.*`: the C6747 memory map. `C6xHost.cpp`: CIO at `C$$IO$$`, the stop at `C$$EXIT`
   (A4 is the status; with `--main-status`, `main`'s return or `exit`'s argument - TI's boot calls `exit(1)` after `main` and `exit`'s cleanup reuses A4), `-c` cycles from `main` as `cycle.CPU` counts them, `--trace` in trace.js's
-  form with in-flight results shown landed, as a halted simulator shows them.
+  form with in-flight results shown landed, as a halted simulator shows them. A file opened
+  without O_BINARY is translated as CCS 5.5's host on the same system translates it: the C runtime's text
+  mode on Windows (LF written as CR LF, CR LF read as LF, a read ending at ^Z), nothing on Linux and macOS.
 - Not modelled: the memory system (so `cycle.Total` is not matched, only `cycle.CPU`), the
   cross-path stall, interrupts and exceptions.
 - `tests/c6x-all.sh` runs every test of this path; `docs/REVIEW-2026-10-05.md` is its review.

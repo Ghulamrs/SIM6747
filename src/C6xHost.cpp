@@ -17,12 +17,23 @@
 #include "C6xCpu.h"
 #include "C6xImage.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <map>
 #include <string>
+
+#ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
+#include <sys/stat.h>
+#else
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
 
 namespace c6x {
 
@@ -36,11 +47,41 @@ enum Cio : uint8_t {
     DTGETENV = 0xF6, DTRENAME = 0xF7, DTGETTIME = 0xF8, DTGETCLK = 0xF9, DTSYNC = 0xFF
 };
 
+// A host file by its own descriptor, as TI's host keeps one. On Windows CCS 5.5's host translates a file
+// opened without O_BINARY as the Microsoft C runtime's text mode does (measured, see openFile); its Linux
+// host translates nothing. Each build of vm6747sim answers as TI's host on that system does.
+#ifdef _WIN32
+int openFile(const char *path, unsigned flags) {
+    // A text file is the C runtime's _O_TEXT: LF written as CR LF, CR LF read as LF, a read ending at ^Z.
+    int o = ((flags & 3) == 0 ? _O_RDONLY : (flags & 3) == 1 ? _O_WRONLY : _O_RDWR) | ((flags & 0x8000) ? _O_BINARY : _O_TEXT);
+    if (flags & 8) o |= _O_APPEND;
+    if (flags & 0x200) o |= _O_CREAT;
+    if (flags & 0x400) o |= _O_TRUNC;
+    return _open(path, o, _S_IREAD | _S_IWRITE);
+}
+int readFile(int h, char *b, unsigned n) { return _read(h, b, n); }
+int writeFile(int h, const char *b, unsigned n) { return _write(h, b, n); }
+long seekFile(int h, long off, int origin) { return _lseek(h, off, origin); }
+int closeFile(int h) { return _close(h); }
+#else
+int openFile(const char *path, unsigned flags) {
+    int o = (flags & 3) == 0 ? O_RDONLY : (flags & 3) == 1 ? O_WRONLY : O_RDWR;
+    if (flags & 8) o |= O_APPEND;
+    if (flags & 0x200) o |= O_CREAT;
+    if (flags & 0x400) o |= O_TRUNC;
+    return ::open(path, o, 0666);
+}
+int readFile(int h, char *b, unsigned n) { return int(::read(h, b, n)); }
+int writeFile(int h, const char *b, unsigned n) { return int(::write(h, b, n)); }
+long seekFile(int h, long off, int origin) { return long(::lseek(h, off, origin)); }
+int closeFile(int h) { return ::close(h); }
+#endif
+
 struct Host {
     Cpu6x &cpu;
     Memory &mem;
     uint32_t cioBuf = 0;
-    std::map<int, FILE *> files;       // by the target's descriptor
+    std::map<int, int> files;          // the host's file descriptor, by the target's
     std::map<int, int> slots, slotOf;  // the host's own slot numbers, which open answers, and back
     explicit Host(Cpu6x &c) : cpu(c), mem(c.memory()) {}
 
@@ -49,12 +90,11 @@ struct Host {
     static void st16(uint8_t *p, uint32_t v) { p[0] = uint8_t(v); p[1] = uint8_t(v >> 8); }
     static void st32(uint8_t *p, uint32_t v) { for (int i = 0; i < 4; i++) p[i] = uint8_t(v >> (8 * i)); }
 
-    FILE *fileOf(int fd) {
-        if (fd == 1) return stdout;
-        if (fd == 2) return stderr;
-        if (fd == 0) return stdin;
-        std::map<int, FILE *>::iterator i = files.find(fd);
-        return i == files.end() ? nullptr : i->second;
+    // stdin, stdout and stderr are the host's own streams; any other descriptor a file it opened, or -1.
+    static FILE *streamOf(int fd) { return fd == 0 ? stdin : fd == 1 ? stdout : fd == 2 ? stderr : nullptr; }
+    int fileOf(int fd) {
+        std::map<int, int>::iterator i = files.find(fd);
+        return i == files.end() ? -1 : i->second;
     }
 
     // One request: [length:4][command:1][parameters:8][data], answered as [length:4][parameters:8][data].
@@ -80,12 +120,11 @@ struct Host {
             if (path == "stdout") answer = 1; else if (path == "stderr") answer = 2; else if (path == "stdin") answer = 0;
             else {
                 // rts file.h: O_RDONLY 0, O_WRONLY 1, O_RDWR 2, O_APPEND 8, O_CREAT 0x200, O_TRUNC 0x400, O_BINARY 0x8000
-                const char *mode = (flags & 3) == 0 ? "rb" : (flags & 8) ? ((flags & 3) == 2 ? "a+b" : "ab")
-                                 : (flags & 0x400) || (flags & 0x200) ? ((flags & 3) == 2 ? "w+b" : "wb") : "r+b";
-                if (FILE *f = std::fopen(path.c_str(), mode)) {
-                    std::map<int, FILE *>::iterator old = files.find(fd);
-                    if (old != files.end()) std::fclose(old->second);
-                    files[fd] = f;
+                int h = openFile(path.c_str(), flags);
+                if (h >= 0) {
+                    std::map<int, int>::iterator old = files.find(fd);
+                    if (old != files.end()) closeFile(old->second);
+                    files[fd] = h;
                     answer = 3;
                     while (slots.count(answer)) answer++;
                     slots[answer] = fd;
@@ -99,8 +138,8 @@ struct Host {
             int fd = int16_t(ld16(parm));
             int r = 0;
             if (fd > 2) {
-                FILE *f = fileOf(fd);
-                r = f ? std::fclose(f) : -1;
+                int h = fileOf(fd);
+                r = h >= 0 ? closeFile(h) : -1;
                 files.erase(fd);
                 std::map<int, int>::iterator s = slotOf.find(fd);
                 if (s != slotOf.end()) { slots.erase(s->second); slotOf.erase(s); }
@@ -111,17 +150,19 @@ struct Host {
         case DTWRITE: {
             int fd = int16_t(ld16(parm));
             unsigned count = ld16(parm + 2);
-            FILE *f = fileOf(fd);
-            size_t w = f ? std::fwrite(data.data(), 1, std::min<size_t>(count, data.size()), f) : 0;
-            if (f) std::fflush(f);
-            st16(out, f ? uint32_t(w) : 0xffffu);
+            unsigned n = unsigned(std::min<size_t>(count, data.size()));
+            int w = -1;
+            if (FILE *f = streamOf(fd)) { w = int(std::fwrite(data.data(), 1, n, f)); std::fflush(f); }
+            else if (fileOf(fd) >= 0) w = writeFile(fileOf(fd), data.data(), n);
+            st16(out, w < 0 ? 0xffffu : uint32_t(w));
             break;
         }
         case DTREAD: {
             int fd = int16_t(ld16(parm));
             unsigned count = ld16(parm + 2);
-            FILE *f = fileOf(fd);
+            FILE *f = streamOf(fd);
             std::string buf;
+            int r = 0;
             if (f == stdin) {
                 // A line at a time, as a terminal gives it: a conversation on stdin (Shalimar's debugger
                 // session) sends one line and waits for the answer, so a read must not wait for count bytes.
@@ -130,22 +171,27 @@ struct Host {
                     buf.push_back(char(c));
                     if (c == '\n') break;
                 }
+            } else if (f) {
+                r = 0;                          // stdout and stderr give nothing back, as they did
+            } else if (fileOf(fd) < 0) {
+                r = -1;
             } else {
-                buf.assign(count, '\0');
-                buf.resize(f ? std::fread(&buf[0], 1, count, f) : 0);
+                buf.assign(count + 1, '\0');
+                r = readFile(fileOf(fd), &buf[0], count);
+                buf.resize(r > 0 ? size_t(r) : 0);
             }
-            size_t r = buf.size();
             reply = buf;
-            st16(out, f ? uint32_t(r) : 0xffffu);
+            st16(out, r < 0 ? 0xffffu : uint32_t(buf.size()));
             break;
         }
         case DTLSEEK: {
             int fd = int16_t(ld16(parm));
             int32_t off = int32_t(ld32(parm + 2));
             int origin = int16_t(ld16(parm + 6));
-            FILE *f = fileOf(fd);
+            int whence = origin == 0 ? SEEK_SET : origin == 1 ? SEEK_CUR : SEEK_END;
             long r = -1;
-            if (f && std::fseek(f, off, origin == 0 ? SEEK_SET : origin == 1 ? SEEK_CUR : SEEK_END) == 0) r = std::ftell(f);
+            if (FILE *f = streamOf(fd)) { if (std::fseek(f, off, whence) == 0) r = std::ftell(f); }
+            else if (fileOf(fd) >= 0) r = seekFile(fileOf(fd), off, whence);
             st32(out, uint32_t(r));
             break;
         }
