@@ -7,54 +7,54 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C03C1872BDB81130B257B7B1 /* src/Asm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8ACE90D23DDE461485377D8 /* src/Asm.cpp */; };
-		A789BD87C14E5D70B8A9132A /* src/C6xCpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A858A86A100986EF5E58B /* src/C6xCpu.cpp */; };
-		DA1582BBF9411B0F3BC90494 /* src/C6xDecode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4642F2EA440545F2F95950D6 /* src/C6xDecode.cpp */; };
-		A0898A4FBB5F393E62671E4A /* src/C6xDis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8981926DC6415C6EF81D39DB /* src/C6xDis.cpp */; };
-		2E2C88EBC812EE1BBA63B926 /* src/C6xExec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC58B3081807EBB7E835D60 /* src/C6xExec.cpp */; };
-		3E50B18EBFD81EC81E42C9D4 /* src/C6xHost.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 84B54F8F0FCE3B933F776ADE /* src/C6xHost.cpp */; };
-		E9BB1133D06AF910423EDADA /* src/C6xImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B32F72251C2ED0FDAFD10762 /* src/C6xImage.cpp */; };
-		3DC8DD1E15389174414D8EEA /* src/C6xIsa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1B60C765BDE8E764FDD1FD18 /* src/C6xIsa.cpp */; };
-		140DF685538C647C46F55C2F /* src/C6xLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8FCB28BFBCB42F0B43ED87B /* src/C6xLoop.cpp */; };
-		B215869E5DAD487585B2CF5E /* src/C6xMem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1ED8DC9DAF9DEE003F8A9254 /* src/C6xMem.cpp */; };
-		F69398063E3B3FB0137CA145 /* src/Cpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2BD303AA2B101D2AD2808595 /* src/Cpu.cpp */; };
-		87ACE02FF263673901F8A7A2 /* src/Isa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 652703C74A59F0F0AFBD81C4 /* src/Isa.cpp */; };
-		06D7654D1D740815BFA2D29A /* src/Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B178357C166FFF1E18231D6 /* src/Runtime.cpp */; };
-		F0836069F8FDA08BD27B0F18 /* src/main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A58C20B63AA5DB1D3FBBBD3D /* src/main.cpp */; };
+		35FAA1668B2346E8477ED7F7 /* src/Asm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C7AA275D57BCAF1B3CAED653 /* src/Asm.cpp */; };
+		42208F18B3B95E84A376D46A /* src/C6xCpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9BBB8FB67146BB1881D378D /* src/C6xCpu.cpp */; };
+		B5CACDCC1643CECAEADA33E0 /* src/C6xDecode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445009B7B06DD9CA82F4A2B0 /* src/C6xDecode.cpp */; };
+		20BBB5358D8D2363B80C0229 /* src/C6xDis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7B5A4E1BDC0B11EE32F18E8E /* src/C6xDis.cpp */; };
+		8E973887BAA5FD583E07085E /* src/C6xExec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2645732B2D0394FDC72CD68 /* src/C6xExec.cpp */; };
+		004DA98C3A0C5DA91A0476A7 /* src/C6xHost.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E817F2C1652BADA557C19884 /* src/C6xHost.cpp */; };
+		A97C01505D1B90A423AE525E /* src/C6xImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41F356C239C86EED75BDC66C /* src/C6xImage.cpp */; };
+		1DBDBDA8076CDF6DE44EC846 /* src/C6xIsa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5EE479EE2E2B107BC9623D4C /* src/C6xIsa.cpp */; };
+		7125C0E8480E4A9C4C458315 /* src/C6xLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 985C8DE6282CC3861BCD3F21 /* src/C6xLoop.cpp */; };
+		52B1EC9BDC37F68EDBC3F53B /* src/C6xMem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE48BA3F6F0DDA1AE5200FDA /* src/C6xMem.cpp */; };
+		E44C965D33EADE21DD4355CD /* src/Cpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F7E44F3E248DEA4FA83C29 /* src/Cpu.cpp */; };
+		956BB00EDF03213A14B9976D /* src/Isa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA367657AA1002F0B0462DB9 /* src/Isa.cpp */; };
+		C93D4B9DD1C557AB4377984D /* src/Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD9575FAD0C694E15407BA8B /* src/Runtime.cpp */; };
+		67E9F49112040F86836B8D6E /* src/main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EF6CD6510D92AB6FC52777D1 /* src/main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		F8ACE90D23DDE461485377D8 /* src/Asm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Asm.cpp; sourceTree = "<group>"; };
-		0C7A858A86A100986EF5E58B /* src/C6xCpu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xCpu.cpp; sourceTree = "<group>"; };
-		4642F2EA440545F2F95950D6 /* src/C6xDecode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xDecode.cpp; sourceTree = "<group>"; };
-		8981926DC6415C6EF81D39DB /* src/C6xDis.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xDis.cpp; sourceTree = "<group>"; };
-		AAC58B3081807EBB7E835D60 /* src/C6xExec.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xExec.cpp; sourceTree = "<group>"; };
-		84B54F8F0FCE3B933F776ADE /* src/C6xHost.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xHost.cpp; sourceTree = "<group>"; };
-		B32F72251C2ED0FDAFD10762 /* src/C6xImage.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xImage.cpp; sourceTree = "<group>"; };
-		1B60C765BDE8E764FDD1FD18 /* src/C6xIsa.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xIsa.cpp; sourceTree = "<group>"; };
-		F8FCB28BFBCB42F0B43ED87B /* src/C6xLoop.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xLoop.cpp; sourceTree = "<group>"; };
-		1ED8DC9DAF9DEE003F8A9254 /* src/C6xMem.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xMem.cpp; sourceTree = "<group>"; };
-		2BD303AA2B101D2AD2808595 /* src/Cpu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Cpu.cpp; sourceTree = "<group>"; };
-		652703C74A59F0F0AFBD81C4 /* src/Isa.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Isa.cpp; sourceTree = "<group>"; };
-		4B178357C166FFF1E18231D6 /* src/Runtime.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Runtime.cpp; sourceTree = "<group>"; };
-		A58C20B63AA5DB1D3FBBBD3D /* src/main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/main.cpp; sourceTree = "<group>"; };
-		318BC9B170295AAA1220AF71 /* src/Asm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Asm.h; sourceTree = "<group>"; };
-		CFED80A1951F6C0DEC4C5756 /* src/C6xCpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xCpu.h; sourceTree = "<group>"; };
-		CF68C1328BC3E051CD27CD9A /* src/C6xDecode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xDecode.h; sourceTree = "<group>"; };
-		96AF585985A1FA37F326BC56 /* src/C6xDis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xDis.h; sourceTree = "<group>"; };
-		5441615FE89AF40FE2EC1256 /* src/C6xHost.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xHost.h; sourceTree = "<group>"; };
-		3B94A063D53E2C153A18793B /* src/C6xImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xImage.h; sourceTree = "<group>"; };
-		89A7E37A4F766A927215D970 /* src/C6xIsa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xIsa.h; sourceTree = "<group>"; };
-		E94657D01B0E84E01DD60852 /* src/C6xMem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xMem.h; sourceTree = "<group>"; };
-		91144CF3D0E5985227326733 /* src/Cpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Cpu.h; sourceTree = "<group>"; };
-		C12A2821733BD43F315FE82A /* src/Isa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Isa.h; sourceTree = "<group>"; };
-		18BF32A88DD963E3BC2BF792 /* src/Program.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Program.h; sourceTree = "<group>"; };
-		F302D82DAEAF140D47E6C1D9 /* src/Runtime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Runtime.h; sourceTree = "<group>"; };
-		A6D16C1F5B156175C01B1B5A /* sim6747.exe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sim6747.exe; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7AA275D57BCAF1B3CAED653 /* src/Asm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Asm.cpp; sourceTree = "<group>"; };
+		B9BBB8FB67146BB1881D378D /* src/C6xCpu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xCpu.cpp; sourceTree = "<group>"; };
+		445009B7B06DD9CA82F4A2B0 /* src/C6xDecode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xDecode.cpp; sourceTree = "<group>"; };
+		7B5A4E1BDC0B11EE32F18E8E /* src/C6xDis.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xDis.cpp; sourceTree = "<group>"; };
+		B2645732B2D0394FDC72CD68 /* src/C6xExec.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xExec.cpp; sourceTree = "<group>"; };
+		E817F2C1652BADA557C19884 /* src/C6xHost.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xHost.cpp; sourceTree = "<group>"; };
+		41F356C239C86EED75BDC66C /* src/C6xImage.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xImage.cpp; sourceTree = "<group>"; };
+		5EE479EE2E2B107BC9623D4C /* src/C6xIsa.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xIsa.cpp; sourceTree = "<group>"; };
+		985C8DE6282CC3861BCD3F21 /* src/C6xLoop.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xLoop.cpp; sourceTree = "<group>"; };
+		CE48BA3F6F0DDA1AE5200FDA /* src/C6xMem.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/C6xMem.cpp; sourceTree = "<group>"; };
+		44F7E44F3E248DEA4FA83C29 /* src/Cpu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Cpu.cpp; sourceTree = "<group>"; };
+		FA367657AA1002F0B0462DB9 /* src/Isa.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Isa.cpp; sourceTree = "<group>"; };
+		BD9575FAD0C694E15407BA8B /* src/Runtime.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Runtime.cpp; sourceTree = "<group>"; };
+		EF6CD6510D92AB6FC52777D1 /* src/main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/main.cpp; sourceTree = "<group>"; };
+		5B25A97B6E976BD4C7984933 /* src/Asm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Asm.h; sourceTree = "<group>"; };
+		946074684180C9AD6160E315 /* src/C6xCpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xCpu.h; sourceTree = "<group>"; };
+		D992E772B2DFFB4753212242 /* src/C6xDecode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xDecode.h; sourceTree = "<group>"; };
+		C7735712F36F966B93CC4786 /* src/C6xDis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xDis.h; sourceTree = "<group>"; };
+		4D5EE4FE6BD54CFBCF1E5D05 /* src/C6xHost.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xHost.h; sourceTree = "<group>"; };
+		4DA997A6F4FD0E1464C6B734 /* src/C6xImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xImage.h; sourceTree = "<group>"; };
+		D1BB7CB1A7A3EC4305C62000 /* src/C6xIsa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xIsa.h; sourceTree = "<group>"; };
+		BB824315803E18C5B96BC5B2 /* src/C6xMem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/C6xMem.h; sourceTree = "<group>"; };
+		A75AC91B43AE2FB88989FF3C /* src/Cpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Cpu.h; sourceTree = "<group>"; };
+		60917E0DB066F35D4391A8BB /* src/Isa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Isa.h; sourceTree = "<group>"; };
+		DEEB2296CF6A8EBA708F18F0 /* src/Program.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Program.h; sourceTree = "<group>"; };
+		B8D82AE9257C327BAF63A843 /* src/Runtime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Runtime.h; sourceTree = "<group>"; };
+		B91267F56D6AA1024A984CAF /* sim6747.exe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sim6747.exe; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		971178FDEDC7B31962AC661F /* Frameworks */ = {
+		29376E9BB3E1962E18FBF714 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -64,51 +64,51 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		D5C1DD2264497D7FFC19499A = {
+		F17742E88344F330BF4A54DF = {
 			isa = PBXGroup;
 			children = (
-				D911C357F41A27C67688A242 /* Sources */,
-				ACD5DA66D1BA6D34C9E0F52B /* Products */,
+				E09B54B234756AA0C2A81D3D /* Sources */,
+				1DC65B20B5159A846DE31BCF /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		D911C357F41A27C67688A242 /* Sources */ = {
+		E09B54B234756AA0C2A81D3D /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				F8ACE90D23DDE461485377D8 /* src/Asm.cpp */,
-				0C7A858A86A100986EF5E58B /* src/C6xCpu.cpp */,
-				4642F2EA440545F2F95950D6 /* src/C6xDecode.cpp */,
-				8981926DC6415C6EF81D39DB /* src/C6xDis.cpp */,
-				AAC58B3081807EBB7E835D60 /* src/C6xExec.cpp */,
-				84B54F8F0FCE3B933F776ADE /* src/C6xHost.cpp */,
-				B32F72251C2ED0FDAFD10762 /* src/C6xImage.cpp */,
-				1B60C765BDE8E764FDD1FD18 /* src/C6xIsa.cpp */,
-				F8FCB28BFBCB42F0B43ED87B /* src/C6xLoop.cpp */,
-				1ED8DC9DAF9DEE003F8A9254 /* src/C6xMem.cpp */,
-				2BD303AA2B101D2AD2808595 /* src/Cpu.cpp */,
-				652703C74A59F0F0AFBD81C4 /* src/Isa.cpp */,
-				4B178357C166FFF1E18231D6 /* src/Runtime.cpp */,
-				A58C20B63AA5DB1D3FBBBD3D /* src/main.cpp */,
-				318BC9B170295AAA1220AF71 /* src/Asm.h */,
-				CFED80A1951F6C0DEC4C5756 /* src/C6xCpu.h */,
-				CF68C1328BC3E051CD27CD9A /* src/C6xDecode.h */,
-				96AF585985A1FA37F326BC56 /* src/C6xDis.h */,
-				5441615FE89AF40FE2EC1256 /* src/C6xHost.h */,
-				3B94A063D53E2C153A18793B /* src/C6xImage.h */,
-				89A7E37A4F766A927215D970 /* src/C6xIsa.h */,
-				E94657D01B0E84E01DD60852 /* src/C6xMem.h */,
-				91144CF3D0E5985227326733 /* src/Cpu.h */,
-				C12A2821733BD43F315FE82A /* src/Isa.h */,
-				18BF32A88DD963E3BC2BF792 /* src/Program.h */,
-				F302D82DAEAF140D47E6C1D9 /* src/Runtime.h */,
+				C7AA275D57BCAF1B3CAED653 /* src/Asm.cpp */,
+				B9BBB8FB67146BB1881D378D /* src/C6xCpu.cpp */,
+				445009B7B06DD9CA82F4A2B0 /* src/C6xDecode.cpp */,
+				7B5A4E1BDC0B11EE32F18E8E /* src/C6xDis.cpp */,
+				B2645732B2D0394FDC72CD68 /* src/C6xExec.cpp */,
+				E817F2C1652BADA557C19884 /* src/C6xHost.cpp */,
+				41F356C239C86EED75BDC66C /* src/C6xImage.cpp */,
+				5EE479EE2E2B107BC9623D4C /* src/C6xIsa.cpp */,
+				985C8DE6282CC3861BCD3F21 /* src/C6xLoop.cpp */,
+				CE48BA3F6F0DDA1AE5200FDA /* src/C6xMem.cpp */,
+				44F7E44F3E248DEA4FA83C29 /* src/Cpu.cpp */,
+				FA367657AA1002F0B0462DB9 /* src/Isa.cpp */,
+				BD9575FAD0C694E15407BA8B /* src/Runtime.cpp */,
+				EF6CD6510D92AB6FC52777D1 /* src/main.cpp */,
+				5B25A97B6E976BD4C7984933 /* src/Asm.h */,
+				946074684180C9AD6160E315 /* src/C6xCpu.h */,
+				D992E772B2DFFB4753212242 /* src/C6xDecode.h */,
+				C7735712F36F966B93CC4786 /* src/C6xDis.h */,
+				4D5EE4FE6BD54CFBCF1E5D05 /* src/C6xHost.h */,
+				4DA997A6F4FD0E1464C6B734 /* src/C6xImage.h */,
+				D1BB7CB1A7A3EC4305C62000 /* src/C6xIsa.h */,
+				BB824315803E18C5B96BC5B2 /* src/C6xMem.h */,
+				A75AC91B43AE2FB88989FF3C /* src/Cpu.h */,
+				60917E0DB066F35D4391A8BB /* src/Isa.h */,
+				DEEB2296CF6A8EBA708F18F0 /* src/Program.h */,
+				B8D82AE9257C327BAF63A843 /* src/Runtime.h */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
 		};
-		ACD5DA66D1BA6D34C9E0F52B /* Products */ = {
+		1DC65B20B5159A846DE31BCF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A6D16C1F5B156175C01B1B5A /* sim6747.exe */,
+				B91267F56D6AA1024A984CAF /* sim6747.exe */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -116,13 +116,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2564CB7A74E42A161DBF03ED /* sim6747.exe */ = {
+		5E960C5054CCAAB1660E0661 /* sim6747.exe */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DC50E7C2D0FB9D5E09452A0B;
+			buildConfigurationList = A08285AF014EC595BF77CF5D;
 			buildPhases = (
-				26D9D9475386A1F249626596 /* Sources */,
-				971178FDEDC7B31962AC661F /* Frameworks */,
-				6D54444E0B02537F726D3E74 /* put the finished program in RIDE's directory */,
+				CE5420DDA51C956DC2337244 /* Sources */,
+				29376E9BB3E1962E18FBF714 /* Frameworks */,
+				0E28ABC484D9DF11EA80C3C2 /* put the finished program in RIDE's directory */,
 			);
 			buildRules = (
 			);
@@ -130,37 +130,37 @@
 			);
 			name = sim6747.exe;
 			productName = sim6747.exe;
-			productReference = A6D16C1F5B156175C01B1B5A /* sim6747.exe */;
+			productReference = B91267F56D6AA1024A984CAF /* sim6747.exe */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		9CA84A7FBD2304120485A273 /* Project object */ = {
+		A910B14F334B2CCB408CC47F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1600;
 			};
-			buildConfigurationList = AD7BF667F40FBA80B0A148F1;
+			buildConfigurationList = 1C2100BF79D1F0EC33FABBC5;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = D5C1DD2264497D7FFC19499A;
-			productRefGroup = ACD5DA66D1BA6D34C9E0F52B /* Products */;
+			mainGroup = F17742E88344F330BF4A54DF;
+			productRefGroup = 1DC65B20B5159A846DE31BCF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2564CB7A74E42A161DBF03ED /* sim6747.exe */,
+				5E960C5054CCAAB1660E0661 /* sim6747.exe */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		6D54444E0B02537F726D3E74 /* put the finished program in RIDE's directory */ = {
+		0E28ABC484D9DF11EA80C3C2 /* put the finished program in RIDE's directory */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -178,31 +178,31 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		26D9D9475386A1F249626596 /* Sources */ = {
+		CE5420DDA51C956DC2337244 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C03C1872BDB81130B257B7B1 /* src/Asm.cpp in Sources */,
-				A789BD87C14E5D70B8A9132A /* src/C6xCpu.cpp in Sources */,
-				DA1582BBF9411B0F3BC90494 /* src/C6xDecode.cpp in Sources */,
-				A0898A4FBB5F393E62671E4A /* src/C6xDis.cpp in Sources */,
-				2E2C88EBC812EE1BBA63B926 /* src/C6xExec.cpp in Sources */,
-				3E50B18EBFD81EC81E42C9D4 /* src/C6xHost.cpp in Sources */,
-				E9BB1133D06AF910423EDADA /* src/C6xImage.cpp in Sources */,
-				3DC8DD1E15389174414D8EEA /* src/C6xIsa.cpp in Sources */,
-				140DF685538C647C46F55C2F /* src/C6xLoop.cpp in Sources */,
-				B215869E5DAD487585B2CF5E /* src/C6xMem.cpp in Sources */,
-				F69398063E3B3FB0137CA145 /* src/Cpu.cpp in Sources */,
-				87ACE02FF263673901F8A7A2 /* src/Isa.cpp in Sources */,
-				06D7654D1D740815BFA2D29A /* src/Runtime.cpp in Sources */,
-				F0836069F8FDA08BD27B0F18 /* src/main.cpp in Sources */,
+				35FAA1668B2346E8477ED7F7 /* src/Asm.cpp in Sources */,
+				42208F18B3B95E84A376D46A /* src/C6xCpu.cpp in Sources */,
+				B5CACDCC1643CECAEADA33E0 /* src/C6xDecode.cpp in Sources */,
+				20BBB5358D8D2363B80C0229 /* src/C6xDis.cpp in Sources */,
+				8E973887BAA5FD583E07085E /* src/C6xExec.cpp in Sources */,
+				004DA98C3A0C5DA91A0476A7 /* src/C6xHost.cpp in Sources */,
+				A97C01505D1B90A423AE525E /* src/C6xImage.cpp in Sources */,
+				1DBDBDA8076CDF6DE44EC846 /* src/C6xIsa.cpp in Sources */,
+				7125C0E8480E4A9C4C458315 /* src/C6xLoop.cpp in Sources */,
+				52B1EC9BDC37F68EDBC3F53B /* src/C6xMem.cpp in Sources */,
+				E44C965D33EADE21DD4355CD /* src/Cpu.cpp in Sources */,
+				956BB00EDF03213A14B9976D /* src/Isa.cpp in Sources */,
+				C93D4B9DD1C557AB4377984D /* src/Runtime.cpp in Sources */,
+				67E9F49112040F86836B8D6E /* src/main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		49F97AE5A2ADC52668FFEEF5 /* Debug */ = {
+		76DA8E4F9D44E4845ED620AB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -228,7 +228,7 @@
 			};
 			name = Debug;
 		};
-		6103521E20BC8851CD0B09DC /* Release */ = {
+		68C079E3E00885300AB2B7D3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -254,7 +254,7 @@
 			};
 			name = Release;
 		};
-		C03D59B0D55D4D98408E05A1 /* Debug */ = {
+		EB996C4F553EAABAB152C9D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -280,7 +280,7 @@
 			};
 			name = Debug;
 		};
-		AFEB11EBE38E3B4942FACA11 /* Release */ = {
+		683B73C5CF68B1C838E46220 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -309,25 +309,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AD7BF667F40FBA80B0A148F1 /* project */ = {
+		1C2100BF79D1F0EC33FABBC5 /* project */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				49F97AE5A2ADC52668FFEEF5 /* Debug */,
-				6103521E20BC8851CD0B09DC /* Release */,
+				76DA8E4F9D44E4845ED620AB /* Debug */,
+				68C079E3E00885300AB2B7D3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		DC50E7C2D0FB9D5E09452A0B /* target */ = {
+		A08285AF014EC595BF77CF5D /* target */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C03D59B0D55D4D98408E05A1 /* Debug */,
-				AFEB11EBE38E3B4942FACA11 /* Release */,
+				EB996C4F553EAABAB152C9D9 /* Debug */,
+				683B73C5CF68B1C838E46220 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 9CA84A7FBD2304120485A273 /* Project object */;
+	rootObject = A910B14F334B2CCB408CC47F /* Project object */;
 }

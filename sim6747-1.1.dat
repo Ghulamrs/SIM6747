@@ -1,0 +1,34 @@
+©2026 G. R. Akhtar - SIM6747 (C6747 simulator) 1.1
+Release seal, version 1.1, sealed 07-10-2026
+Written by tools/seal; check it with `tools/seal check`.
+CRC32  size  file - 27 files, seal DDB5751B
+------------------------------------------------------------------
+9F6E4213     32876  src/Asm.cpp
+7E57EAB1       993  src/Asm.h
+F7F5102B     14432  src/C6xCpu.cpp
+C9905C05      7005  src/C6xCpu.h
+4DAE3595     20532  src/C6xDecode.cpp
+83591EED      3252  src/C6xDecode.h
+3050C314      3659  src/C6xDis.cpp
+880EFBE4       132  src/C6xDis.h
+31A43C14     34707  src/C6xExec.cpp
+92AB4076     17160  src/C6xHost.cpp
+AE01C9E0       116  src/C6xHost.h
+549EC211     14535  src/C6xImage.cpp
+2A612FBE      1839  src/C6xImage.h
+4D5B5319      2241  src/C6xIsa.cpp
+DB035892      4446  src/C6xIsa.h
+F307644B      9353  src/C6xLoop.cpp
+68B320B6      3261  src/C6xMem.cpp
+B3932AEB      2393  src/C6xMem.h
+FCEB5DE6    192188  src/C6xOpcodes.inc
+5CB47B84     36830  src/Cpu.cpp
+5AF82E31      7572  src/Cpu.h
+91AED06C     11043  src/Isa.cpp
+A9171E21      2114  src/Isa.h
+F6436AFD      3226  src/Program.h
+DE1B3610     81290  src/Runtime.cpp
+A31E8B84      4565  src/Runtime.h
+30DCB9E5      7944  src/main.cpp
+------------------------------------------------------------------
+Sealed on 07-10-2026
