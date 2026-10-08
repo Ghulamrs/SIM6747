@@ -1,5 +1,10 @@
 # Fix request for Cowork: D1–D5 from the review of 2026-10-05
 
+**Closed, every item (re-read 2026-10-08 for the review of that day, S6):** D1 `8c91b74`, D2 `49e5790`,
+D3 `e6ea0fd`, D4 `dbee128`, D5 `32eddab`, D6 `2212e50`, D7 `982fa00`, D8 `000488c` - each on `master`
+with its test, as the list below says. What is left open is the last paragraph's two unconfirmed
+readings (the fcyc bit order, the compact LDNDW/STNDW offset forms), which no image here exercises.
+
 This directory is a clone of `../VM6747-sim` at `43ffc5d`. Make the fixes here and leave
 `../VM6747-sim` untouched.
 
@@ -36,7 +41,7 @@ defects, each with a reproducer, and section 1 gives the analysis behind them.
    wrong answer. Check the DP compares (`CMPEQDP`, `CMPLTDP`, `CMPGTDP`) for NaN as unordered, and the division path
    for NaN and infinity. See `docs/TEST-2026-10-06.md`.
 
-D1, D2 and D3 are fixed and on `master`. D4, D5 and D6 were fixed on 2026-10-06, each with its test:
+D1, D2 and D3 are fixed and on `master`: D2 `49e5790`, D1 `8c91b74`, D3 `e6ea0fd`. D4, D5 and D6 were fixed on 2026-10-06, each with its test:
 - D6 `2212e50` - fphead RS added 16 to a compact MV's 5-bit register (`tests/c6x-rs-mv5.sh`);
 - D5 `32eddab` - a BNOP in an SPLOOP epilog let the next packet issue before it landed (`tests/c6x-epilog-bnop.sh`);
 - D4 `dbee128` - the compact SPKERNEL's fstg/fcyc bit order (`tests/c6x-uspk.sh`).
