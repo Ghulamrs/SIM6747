@@ -77,9 +77,28 @@ long seekFile(int h, long off, int origin) { return long(::lseek(h, off, origin)
 int closeFile(int h) { return ::close(h); }
 #endif
 
+// A path from the root, as CCS 5.5's Windows host reads it (measured): "/x" is x in the program's folder, so
+// /tmp/x needs a tmp folder there and /dev/null opens nothing; "\\x", "C:/x" and a relative path are as written.
+// Its Linux host takes every path as written, and so do the Linux and macOS builds.
+#ifdef _WIN32
+std::string hostPath(const std::string &path, const std::string &folder) {
+    if (path.size() < 2 || path[0] != '/' || path[1] == '/') return path;
+    return (folder.empty() ? std::string(".") : folder) + path;
+}
+#else
+std::string hostPath(const std::string &path, const std::string &) { return path; }
+#endif
+
+// The folder of the image the host runs: what a path from the root is taken under on Windows.
+std::string folderOf(const std::string &image) {
+    std::string::size_type k = image.find_last_of("/\\");
+    return k == std::string::npos ? std::string() : image.substr(0, k);
+}
+
 struct Host {
     Cpu6x &cpu;
     Memory &mem;
+    std::string folder;                // the program's folder, for hostPath
     uint32_t cioBuf = 0;
     std::map<int, int> files;          // the host's file descriptor, by the target's
     std::map<int, int> slots, slotOf;  // the host's own slot numbers, which open answers, and back
@@ -120,7 +139,7 @@ struct Host {
             if (path == "stdout") answer = 1; else if (path == "stderr") answer = 2; else if (path == "stdin") answer = 0;
             else {
                 // rts file.h: O_RDONLY 0, O_WRONLY 1, O_RDWR 2, O_APPEND 8, O_CREAT 0x200, O_TRUNC 0x400, O_BINARY 0x8000
-                int h = openFile(path.c_str(), flags);
+                int h = openFile(hostPath(path, folder).c_str(), flags);
                 if (h >= 0) {
                     std::map<int, int>::iterator old = files.find(fd);
                     if (old != files.end()) closeFile(old->second);
@@ -195,10 +214,10 @@ struct Host {
             st32(out, uint32_t(r));
             break;
         }
-        case DTUNLINK: st16(out, uint32_t(std::remove(data.c_str()))); break;
+        case DTUNLINK: st16(out, uint32_t(std::remove(hostPath(data.c_str(), folder).c_str()))); break;
         case DTRENAME: {
             std::string from(data.c_str()), to(data.size() > from.size() + 1 ? data.c_str() + from.size() + 1 : "");
-            st16(out, uint32_t(std::rename(from.c_str(), to.c_str())));
+            st16(out, uint32_t(std::rename(hostPath(from, folder).c_str(), hostPath(to, folder).c_str())));
             break;
         }
         case DTGETENV: { const char *v = std::getenv(data.c_str()); reply = v ? std::string(v) + '\0' : std::string(1, '\0'); break; }
@@ -278,6 +297,7 @@ int runMain(int argc, char **argv) {
     cpu.setPc(entry);
 
     Host host(cpu);
+    host.folder = folderOf(path);
     uint32_t cioAt = 0, exitAt = 0;
     bool haveCio = findSymbol(img, { "C$$IO$$" }, cioAt);
     bool haveExit = findSymbol(img, { "C$$EXIT" }, exitAt);
