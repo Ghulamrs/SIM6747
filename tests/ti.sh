@@ -23,14 +23,14 @@ set -u
 HERE=$(cd "$(dirname "$0")/.." && pwd)
 WORK=${TMPDIR:-/tmp}/vm6747-ti.$$
 REMOTE='C:/Users/GRA/Documents/VM6747'
-SHMRT="${SHMRT:-$HERE/../Compiler-Si/lib/shmrt-tms6747}"
+SHMRT="${SHMRT:-$HERE/../../Compilers/Compiler-Si/lib/shmrt-tms6747}"
 trap 'rm -rf "$WORK"' EXIT
 mkdir -p "$WORK/tisweep/c" "$WORK/tisweep/cxx" "$WORK/tisweep/shm" "$WORK/tisweep/shmrt"
 # Only real case names: macOS leaves "name 2.s" duplicates beside the files it rewrites.
 stage() { for f in "$1"/*.s; do case "$(basename "$f")" in *" "*) ;; *) [ -f "$f" ] && cp "$f" "$2/";; esac; done; }
-stage "$HERE/../Compiler-Ci/tests/out-tms6747" "$WORK/tisweep/c"
-stage "$HERE/../C++Optimize/tests/out-tms6747" "$WORK/tisweep/cxx"
-stage "$HERE/../Compiler-Si/tests/out-tms6747" "$WORK/tisweep/shm"
+stage "$HERE/../../Compilers/Compiler-Ci/tests/out-tms6747" "$WORK/tisweep/c"
+stage "$HERE/../../Compilers/C++Optimize/tests/out-tms6747" "$WORK/tisweep/cxx"
+stage "$HERE/../../Compilers/Compiler-Si/tests/out-tms6747" "$WORK/tisweep/shm"
 stage "$SHMRT" "$WORK/tisweep/shmrt"
 cp "$HERE/tests/ti-sweep.cmd" "$HERE/tests/ti-link.cmd" "$HERE/tests/par.cmd" "$WORK/tisweep/"
 total=$(ls "$WORK"/tisweep/*/*.s | wc -l | tr -d ' ')

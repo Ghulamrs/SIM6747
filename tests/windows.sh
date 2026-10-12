@@ -19,12 +19,12 @@ VM="${VM:-$HERE/vm6747.exe}"
 mkdir -p "$WORK/xwin/c" "$WORK/xwin/cxx" "$WORK/xwin/shm" "$WORK/xwin/shmrt"
 # Only real case names: macOS leaves "name 2.s" duplicates beside the files
 # it rewrites, and those are noise, not cases.
-for f in "$HERE"/../Compiler-Ci/tests/out-tms6747/*.s; do case "$(basename "$f")" in *" "*) ;; *) cp "$f" "$WORK/xwin/c/";; esac; done
-for f in "$HERE"/../C++Optimize/tests/out-tms6747/*.s; do case "$(basename "$f")" in *" "*) ;; *) cp "$f" "$WORK/xwin/cxx/";; esac; done
+for f in "$HERE"/../../Compilers/Compiler-Ci/tests/out-tms6747/*.s; do case "$(basename "$f")" in *" "*) ;; *) cp "$f" "$WORK/xwin/c/";; esac; done
+for f in "$HERE"/../../Compilers/C++Optimize/tests/out-tms6747/*.s; do case "$(basename "$f")" in *" "*) ;; *) cp "$f" "$WORK/xwin/cxx/";; esac; done
 # The Shalimar programs run beside the runtime cpp11 compiled for the C6000,
 # a directory of .s the emulator takes whole - so it travels too.
 SHMRT="${SHMRT:-$HERE/../../RStudio/bin/lib/shmrt-tms6747}"   # where the one binary directory puts it
-for f in "$HERE"/../Compiler-Si/tests/out-tms6747/*.s; do case "$(basename "$f")" in *" "*) ;; *) cp "$f" "$WORK/xwin/shm/";; esac; done
+for f in "$HERE"/../../Compilers/Compiler-Si/tests/out-tms6747/*.s; do case "$(basename "$f")" in *" "*) ;; *) cp "$f" "$WORK/xwin/shm/";; esac; done
 [ -d "$SHMRT" ] && cp "$SHMRT"/*.s "$WORK/xwin/shmrt/"
 cat > "$WORK/xwin/run.sh" <<'REMOTE_EOF'
 cd "$(dirname "$0")"
