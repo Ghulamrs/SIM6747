@@ -29,7 +29,7 @@ mkdir -p "$WORK/tisweep/c" "$WORK/tisweep/cxx" "$WORK/tisweep/shm" "$WORK/tiswee
 # Only real case names: macOS leaves "name 2.s" duplicates beside the files it rewrites.
 stage() { for f in "$1"/*.s; do case "$(basename "$f")" in *" "*) ;; *) [ -f "$f" ] && cp "$f" "$2/";; esac; done; }
 stage "$HERE/../Compiler-Ci/tests/out-tms6747" "$WORK/tisweep/c"
-stage "$HERE/../Compiler-Cppi/tests/out-tms6747" "$WORK/tisweep/cxx"
+stage "$HERE/../C++Optimize/tests/out-tms6747" "$WORK/tisweep/cxx"
 stage "$HERE/../Compiler-Si/tests/out-tms6747" "$WORK/tisweep/shm"
 stage "$SHMRT" "$WORK/tisweep/shmrt"
 cp "$HERE/tests/ti-sweep.cmd" "$HERE/tests/ti-link.cmd" "$HERE/tests/par.cmd" "$WORK/tisweep/"
