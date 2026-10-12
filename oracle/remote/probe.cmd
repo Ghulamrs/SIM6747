@@ -38,7 +38,7 @@ if exist words.asm (
 )
 
 rem ---- programs
-if "%C6747_EHLIB%"=="" set C6747_EHLIB=C:\cxx1\c6747-lib
+if "%C6747_EHLIB%"=="" set C6747_EHLIB=C:\ti\c6747-lib
 set RTS=%CG%\lib\rts6740_elf.lib
 if exist "%C6747_EHLIB%\rts6740_elf_eh.lib" set RTS=%C6747_EHLIB%\rts6740_elf_eh.lib
 echo runtime %RTS%>> out\inventory.txt
