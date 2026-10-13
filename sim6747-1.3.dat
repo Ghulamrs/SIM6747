@@ -1,7 +1,7 @@
-©2026 G. R. Akhtar - SIM6747 (C6747 simulator) 1.2
-Release seal, version 1.2, sealed 13-10-2026
+©2026 G. R. Akhtar - SIM6747 (C6747 simulator) 1.3
+Release seal, version 1.3, sealed 13-10-2026
 Written by tools/seal; check it with `tools/seal check`.
-CRC32  size  file - 33 files, seal CD70B343
+CRC32  size  file - 33 files, seal 688C37C8
 ------------------------------------------------------------------
 340E0253     34183  src/Asm.cpp
 7E57EAB1       993  src/Asm.h
@@ -35,6 +35,6 @@ A9171E21      2114  src/Isa.h
 C180D99E      3364  src/Program.h
 DE1B3610     81290  src/Runtime.cpp
 6D1D4F0F      4704  src/Runtime.h
-AA3DD70D      8147  src/main.cpp
+2D960EB8      8147  src/main.cpp
 ------------------------------------------------------------------
 Sealed on 13-10-2026
