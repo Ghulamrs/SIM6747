@@ -1,0 +1,33 @@
+<<ride-done>>
+Breakpoint 1 at 0xc0107484: file lines.cpp, line 18.
+Starting program: lines.out
+
+Breakpoint 1, main () at lines.cpp:18
+18	    int x = add(1, 2);
+<<ride-done>>
+_Z3addii () at lines.cpp:11
+11	    int c = a + b;
+#0  _Z3addii () at lines.cpp:11
+#1  0xc01074b2 in main () at lines.cpp:18
+#2  0xc0106c20 in _ZN5rts6x7Startup3runEv ()
+#3  0xc0106c54 in __rts6x_start ()
+Run till exit from #0  _Z3addii () at lines.cpp:11
+0xc01074b2 in main () at lines.cpp:18
+18	    int x = add(1, 2);
+19	    printf("x=%d\n", x);
+x=6
+20	    int y = add(x, 4);
+Breakpoint 2 at 0xc01073b8: file lines.cpp, line 5.
+Continuing.
+
+Breakpoint 2, _ZL5twicei () at lines.cpp:5
+5	    int r = n * 2;
+#0  _ZL5twicei () at lines.cpp:5
+#1  0xc0107440 in _Z3addii () at lines.cpp:12
+#2  0xc0107522 in main () at lines.cpp:20
+#3  0xc0106c20 in _ZN5rts6x7Startup3runEv ()
+#4  0xc0106c54 in __rts6x_start ()
+Continuing.
+y=20
+[Inferior 1 (process 1) exited with code 06]
+exit 6

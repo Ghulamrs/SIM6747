@@ -1,0 +1,15 @@
+echo <<ride-done>>\n
+break lines.cpp:18
+run < /dev/null
+echo <<ride-done>>\n
+step
+backtrace
+finish
+next
+next
+break lines.cpp:5
+continue
+backtrace
+delete
+continue
+quit
