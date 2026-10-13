@@ -434,7 +434,7 @@ struct Assembler {
                     if (!evaluate(u, ln, ln.operands.back(), false, v)) return false;
                     Sym s; s.section = -1; s.offset = static_cast<uint32_t>(v); s.defined = true;
                     u.locals[name] = s;
-                } else if (m == ".end" || m == ".file" || m == ".clink" || m == ".nocmp" || m == ".symdepend" ||
+                } else if (m == ".end" || m == ".file" || m == ".dwpsn" || m == ".clink" || m == ".nocmp" || m == ".symdepend" ||
                            m == ".compiler_opts" || m == ".retain" ||
                            m == ".ident" || m == ".p2align" || m == ".size" || m == ".type" ||
                            m == ".battr" || m == ".elfsym" || m == ".hidden" || m == ".gmember" || m == ".endgroup") {
@@ -482,10 +482,28 @@ struct Assembler {
         uint32_t at[SectionCount];
         for (int k = 0; k < SectionCount; k++) at[k] = u.base[k];
         std::vector<uint8_t> &m = prog.memory;
+        // -g: the source position cl6x's `.dwpsn file "f",line n,...` names, carried onto every instruction after it.
+        std::string srcFile; int srcLine = 0;
         for (const Line &ln : u.lines) {
+            // A function's label ends the position before it: its prologue has none until its own .dwpsn.
+            if (!ln.label.empty() && ln.label[0] != '$' && ln.label[0] != '.' &&
+                ln.label.compare(0, 2, "L$") != 0 && ln.label.compare(0, 2, "L.") != 0) { srcFile.clear(); srcLine = 0; }
             if (ln.mnem.empty()) continue;
             const std::string &mn = ln.mnem;
             if (mn[0] == '.') {
+                if (mn == ".dwpsn") {
+                    for (const std::string &o : ln.operands) {
+                        size_t k = o.find_first_not_of(" \t");
+                        if (k == std::string::npos) continue;
+                        if (o.compare(k, 5, "file ") == 0) {
+                            size_t q = o.find('"', k), e = q == std::string::npos ? q : o.find('"', q + 1);
+                            if (q != std::string::npos && e != std::string::npos) srcFile = o.substr(q + 1, e - q - 1);
+                        } else if (o.compare(k, 5, "line ") == 0) {
+                            srcLine = std::atoi(o.c_str() + k + 5);
+                        }
+                    }
+                    continue;
+                }
                 if (mn == ".text") sec = Text;
                 else if (mn == ".data") sec = Data;
                 else if (mn == ".sect") sectionOf(ln.operands[0], sec);
@@ -535,6 +553,8 @@ struct Assembler {
             in.unit = ln.unit;
             in.file = u.path;
             in.line = ln.number;
+            in.srcFile = srcFile;
+            in.srcLine = srcLine;
             if (!ln.pred.empty()) {
                 int r;
                 if (!regNumber(u, ln.pred, r)) return fail(u, ln, "bad predicate '" + ln.pred + "'");

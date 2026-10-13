@@ -51,6 +51,7 @@ static int nameRank(const std::string &n, bool function) {
 static void addSymbol(Image &img, const std::string &name, uint32_t value, bool function = false) {
     if (name.empty()) return;
     img.symbols[name] = value;
+    if (function) img.functions.insert(value);
     std::map<uint32_t, std::string>::iterator i = img.symbolsAt.find(value);
     int rank = nameRank(name, function);
     if (i == img.symbolsAt.end()) { img.symbolsAt[value] = name; img.rankAt[value] = rank; }
@@ -85,6 +86,10 @@ static bool loadElf(const std::vector<uint8_t> &f, Image &img, std::string &why)
     for (unsigned i = 0; i < shnum; i++) {
         const Sh &s = sh[i];
         const uint32_t SHF_ALLOC = 2, SHF_EXEC = 4, SHT_NOBITS = 8, SHT_PROGBITS = 1;
+        // The line table is not loaded - it is not allocated - but a debugger reads it (DebugC6x.cpp).
+        if (!(s.flags & SHF_ALLOC) && s.size != 0 && s.type == SHT_PROGBITS && uint64_t(s.off) + s.size <= f.size() &&
+            str(shstrndx, s.name) == ".debug_line")
+            img.debugLine.assign(f.begin() + s.off, f.begin() + s.off + s.size);
         if (!(s.flags & SHF_ALLOC) || s.size == 0) continue;
         Section sec;
         sec.name = str(shstrndx, s.name);

@@ -55,6 +55,15 @@ std::string Cpu::where(uint32_t pc) const {
     return s;
 }
 
+uint32_t Cpu::landedReg(int r) const {
+    uint32_t v = r_[r];
+    uint64_t at = 0;
+    bool any = false;
+    for (const Pending &p : pending_)
+        if (p.reg == r && (!any || p.at >= at)) { v = p.value; at = p.at; any = true; }
+    return v;
+}
+
 void Cpu::fault(const std::string &what) {
     std::fprintf(stderr, "sim6747: fault at %s, cycle %llu: %s\n", where(pc_).c_str(),
                  static_cast<unsigned long long>(cycle_), what.c_str());

@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -28,6 +29,8 @@ public:
     std::map<uint32_t, std::string> symbolsAt;     // address -> name, for listings and traces
     std::map<uint32_t, int> rankAt;                // how much that name is wanted (C6xImage.cpp, nameRank)
     std::map<std::string, uint32_t> symbols;       // name -> address
+    std::set<uint32_t> functions;                  // the addresses of the ELF's STT_FUNC symbols
+    std::vector<uint8_t> debugLine;                // the DWARF .debug_line, when the image carries one (cl6x -g)
     uint32_t entry = 0;
     bool hasEntry = false;
     std::string format;                            // "elf", "coff", "ti-txt", "intel", "srec", "bin"

@@ -14,6 +14,7 @@
 //   --trace-view=issue  as the register file holds them at the end of the step
 
 #include "C6xHost.h"
+#include "DebugC6x.h"
 #include "C6xCpu.h"
 #include "C6xImage.h"
 
@@ -258,7 +259,7 @@ void traceLine(FILE *t, uint64_t k, const Cpu6x &cpu, bool landed) {
 
 int runMain(int argc, char **argv) {
     std::string path, tracePath;
-    bool bin = false, counts = false, haveEntry = false, landedView = true, haveCountFrom = false, mainStatus = false;
+    bool bin = false, counts = false, haveEntry = false, landedView = true, haveCountFrom = false, mainStatus = false, debug = false;
     uint32_t countFrom = 0;
     uint32_t base = 0, entry = 0;
     uint64_t steps = ~uint64_t(0), maxCycles = ~uint64_t(0);
@@ -271,11 +272,12 @@ int runMain(int argc, char **argv) {
         else if (a == "--max-cycles" && i + 1 < argc) maxCycles = std::strtoull(argv[++i], nullptr, 10);
         else if (a == "-c") counts = true;
         else if (a == "--main-status") mainStatus = true;
+        else if (a == "--debug") { debug = true; mainStatus = true; }   // a debugger reports main's return, as gdb does
         else if (a == "--count-from" && i + 1 < argc) { haveCountFrom = true; countFrom = uint32_t(std::strtoul(argv[++i], nullptr, 16)); }
         else if (a.compare(0, 13, "--trace-view=") == 0) landedView = a.substr(13) != "issue";
         else path = a;
     }
-    if (path.empty()) { std::fprintf(stderr, "usage: sim6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--main-status] [--count-from ADDR] [--trace FILE] [--trace-view=issue] [--steps N] [--max-cycles N]\n"); return 2; }
+    if (path.empty()) { std::fprintf(stderr, "usage: sim6747 --run FILE [--bin ADDR] [--entry ADDR] [-c] [--main-status] [--count-from ADDR] [--trace FILE] [--trace-view=issue] [--steps N] [--max-cycles N] [--debug]\n"); return 2; }
     Image img;
     std::string why;
     if (!loadImage(path, img, why, bin, base)) { std::fprintf(stderr, "sim6747: %s\n", why.c_str()); return 1; }
@@ -328,6 +330,20 @@ int runMain(int argc, char **argv) {
         if (haveCio && pc == cioAt && host.cioBuf) host.serve();
         return true;
     };
+
+    // --debug: the session of Debug.h over this CPU, the status as below (main's with --main-status).
+    if (debug) {
+        DebugEnds ends;
+        ends.ended = [&]() -> bool { return exited || cpu.stopped(); };
+        ends.status = [&]() -> int {
+            if (exited) return mainReturned ? mainValue : exitCalled ? exitValue : int(cpu.reg(4));
+            return cpu.stopped() ? 70 : 0;
+        };
+        int st = debugRun(cpu, img, path, ends);
+        std::fflush(stdout);
+        if (cpu.stopped()) std::fprintf(stderr, "sim6747: %s\n", cpu.stopReason().c_str());
+        return st & 0xff;
+    }
 
     FILE *trace = nullptr;
     if (!tracePath.empty()) {

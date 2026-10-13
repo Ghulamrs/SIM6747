@@ -1,0 +1,29 @@
+<<ride-done>>
+Breakpoint 1 at 0x80000766: file t.c, line 6.
+Breakpoint 2 at 0x8000074e: file t.c, line 3.
+Starting program: cl6x-g.out
+
+Breakpoint 1, main () at t.c:6
+6	    int r = add(1, 2);
+<<ride-done>>
+add () at t.c:2
+2	    int c = a + b;
+#0  add () at t.c:2
+#1  0x8000076e in main () at t.c:6
+#2  0x800006d8 in _c_int00 () at boot.c:142
+#3  0x800006d8 in _c_int00 () at boot.c:142
+
+Breakpoint 2, add () at t.c:3
+3	    return c;
+4	}
+Run till exit from #0  add () at t.c:4
+0x8000076e in main () at t.c:6
+6	    int r = add(1, 2);
+8	}
+$1 = 3
+No symbol table info available.
+Continuing.
+[Inferior 1 (process 1) exited with code 03]
+No stack.
+The program is not being run.
+exit 3

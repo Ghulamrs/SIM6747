@@ -26,6 +26,15 @@ simulator through `oracle/`.
 - Not modelled: the memory system (so `cycle.Total` is not matched, only `cycle.CPU`), the
   cross-path stall, interrupts and exceptions.
 - `tests/c6x-all.sh` runs every test of this path; `docs/REVIEW-2026-10-05.md` is its review.
+- **`--run --debug prog.out`** (2026-10-13): a debugger session on stdin and stdout in gdb's words - the
+  shell of VM6747's `src/Debug.h`, copied here as `src/Debug.*` (`--debug file.s` is the emulator path
+  under it) - over `src/DebugC6x.cpp`: the lines from the image's DWARF `.debug_line` (versions 2 to 4;
+  cl6x -g writes version 3 with a minimum instruction length of 2), the functions from its STT_FUNC
+  symbols less cl6x's `$C$RL` return labels, the end and the status from C$$EXIT with `--main-status`'s
+  rule. **A cpp11-built image carries no line table**: cpp11 -g writes `.dwpsn`, which ASM6x does not turn
+  into a `.debug_line` and LNK6x does not carry into an image - `break t.c:6` says so by name, and `break
+  main`, `next` (to the caller, as gdb without lines), `backtrace` and the registers still work. `tests/
+  c6x-debug.sh` runs both: cl6x's own -g image (`tests/debug/cl6x-g.out`, with `t.c`) and cpp11's `step.s`.
 
 Runs the C6000 assembly that `c90` and `cpp11` emit for `-arch tms6747`,
 so that the fourth target can be verified the way the other three are: the

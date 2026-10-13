@@ -1,0 +1,45 @@
+<<ride-done>>
+Breakpoint 1 at 0x110c: file step.cpp, line 18.
+Breakpoint 2 at 0x1000: file step.cpp, line 3.
+Starting program: step.s
+
+Breakpoint 1, main () at step.cpp:18
+18	    int x = add(1, 2);
+<<ride-done>>
+_Z3addii () at step.cpp:11
+11	    int c = a + b;
+#0  _Z3addii () at step.cpp:11
+#1  0x00001148 in main () at step.cpp:18
+12	    c = twice(c);
+
+Breakpoint 2, _ZL5twicei () at step.cpp:3
+3	static int twice(int n)
+5	    int r = n * 2;
+#0  _ZL5twicei () at step.cpp:5
+#1  0x000010c0 in _Z3addii () at step.cpp:12
+#2  0x00001148 in main () at step.cpp:18
+Run till exit from #0  _ZL5twicei () at step.cpp:5
+0x000010c0 in _Z3addii () at step.cpp:12
+12	    c = twice(c);
+Run till exit from #0  _Z3addii () at step.cpp:12
+0x00001148 in main () at step.cpp:18
+18	    int x = add(1, 2);
+19	    printf("x=%d\n", x);
+x=6
+20	    int y = add(x, 4);
+
+Breakpoint 2, _ZL5twicei () at step.cpp:3
+3	static int twice(int n)
+$1 = 10
+type = int
+No symbol "x" in current context.
+No symbol table info available.
+$2 = 7
+#0  _ZL5twicei () at step.cpp:3
+3	static int twice(int n)
+Continuing.
+y=14
+[Inferior 1 (process 1) exited normally]
+No stack.
+The program is not being run.
+exit 0
