@@ -57,6 +57,14 @@ public:
     std::vector<ProfileRow> profile() const;
     std::string where(uint32_t pc) const;
 
+    // --debug (Debug.h): one packet - or one native call - at a time from outside, the program counter,
+    // and a register as a halted debugger shows it, every result in flight landed, the machine not moved.
+    void startAt(uint32_t entry) { pc_ = entry; }
+    void debugStep() { step(); }
+    uint32_t pc() const { return pc_; }
+    bool running() const { return running_; }
+    uint32_t landedReg(int r) const;
+
     // The C674x file: A0-A31 and B0-B31. The compilers here use the first
     // sixteen of each; cl6x uses all of them.
     static const int A = 0, B = 32;

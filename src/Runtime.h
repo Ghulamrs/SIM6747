@@ -24,6 +24,8 @@ public:
     static std::string streamObjects();
     // After main returns or exit is called: the __cxa_atexit registrations, last first.
     void runAtExit(Cpu &cpu);
+    // --debug: the program reads nothing from stdin, which carries the debugger's commands.
+    void withNoInput() { stdinRead_ = true; }
 
 private:
     uint32_t heap_ = 0, heapEnd_ = 0;

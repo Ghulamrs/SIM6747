@@ -38,6 +38,9 @@ struct Instr {
     std::vector<Operand> ops;
     std::string file;
     int line = 0;
+    // The source position the last `.dwpsn` before this instruction named (-g), or line 0.
+    std::string srcFile;
+    int srcLine = 0;
 };
 
 struct Program {

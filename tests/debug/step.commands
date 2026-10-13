@@ -1,0 +1,29 @@
+set confirm off
+echo <<ride-done>>\n
+break step.cpp:18
+break step.cpp:3
+run < /dev/null
+echo <<ride-done>>\n
+step
+backtrace
+step
+step
+step
+backtrace
+finish
+finish
+next
+next
+next
+print $A4
+whatis $A4
+print &x
+info locals
+set variable $A4 = 7
+print $A4
+frame 0
+delete
+continue
+backtrace
+continue
+quit
