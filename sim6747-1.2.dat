@@ -1,9 +1,9 @@
 ©2026 G. R. Akhtar - SIM6747 (C6747 simulator) 1.2
 Release seal, version 1.2, sealed 13-10-2026
 Written by tools/seal; check it with `tools/seal check`.
-CRC32  size  file - 27 files, seal 2D1A3C81
+CRC32  size  file - 33 files, seal CD70B343
 ------------------------------------------------------------------
-9F6E4213     32876  src/Asm.cpp
+340E0253     34183  src/Asm.cpp
 7E57EAB1       993  src/Asm.h
 F7F5102B     14432  src/C6xCpu.cpp
 C9905C05      7005  src/C6xCpu.h
@@ -12,23 +12,29 @@ C9905C05      7005  src/C6xCpu.h
 3050C314      3659  src/C6xDis.cpp
 880EFBE4       132  src/C6xDis.h
 31A43C14     34707  src/C6xExec.cpp
-2376611E     18264  src/C6xHost.cpp
+C25254E8     19042  src/C6xHost.cpp
 AE01C9E0       116  src/C6xHost.h
-549EC211     14535  src/C6xImage.cpp
-2A612FBE      1839  src/C6xImage.h
+FBC66FBE     14938  src/C6xImage.cpp
+9D552623      2066  src/C6xImage.h
 4D5B5319      2241  src/C6xIsa.cpp
 DB035892      4446  src/C6xIsa.h
 F307644B      9353  src/C6xLoop.cpp
 68B320B6      3261  src/C6xMem.cpp
 B3932AEB      2393  src/C6xMem.h
 FCEB5DE6    192188  src/C6xOpcodes.inc
-5CB47B84     36830  src/Cpu.cpp
-5AF82E31      7572  src/Cpu.h
+33C58A26     37079  src/Cpu.cpp
+5FC5110E      7991  src/Cpu.h
+DC022372     16975  src/Debug.cpp
+FFE65C20      2672  src/Debug.h
+0E481154     11556  src/DebugC6x.cpp
+191DBEFF       770  src/DebugC6x.h
+59D7A197      4696  src/DebugVm.cpp
+F055D215       299  src/DebugVm.h
 91AED06C     11043  src/Isa.cpp
 A9171E21      2114  src/Isa.h
-F6436AFD      3226  src/Program.h
+C180D99E      3364  src/Program.h
 DE1B3610     81290  src/Runtime.cpp
-A31E8B84      4565  src/Runtime.h
-E92B12BA      7944  src/main.cpp
+6D1D4F0F      4704  src/Runtime.h
+AA3DD70D      8147  src/main.cpp
 ------------------------------------------------------------------
 Sealed on 13-10-2026
