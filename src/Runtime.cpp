@@ -1105,8 +1105,8 @@ bool Runtime::call(const std::string &n, Cpu &c) {
     }
     if (n == "abs" || n == "labs") { int32_t v = static_cast<int32_t>(arg(c, 0)); ret(c, static_cast<uint32_t>(v < 0 ? -v : v)); return true; }
     if (n == "llabs") { int64_t v = static_cast<int64_t>(argWide(c, 0)); retWide(c, static_cast<uint64_t>(v < 0 ? -v : v)); return true; }
-    if (n == "rand") { ret(c, static_cast<uint32_t>(std::rand())); return true; }
-    if (n == "srand") { std::srand(arg(c, 0)); return true; }
+    if (n == "rand") { randState_ = randState_ * 1103515245u + 12345u; ret(c, (randState_ >> 16) & 0x7FFFu); return true; }
+    if (n == "srand") { randState_ = arg(c, 0); return true; }
     if (n == "qsort") {
         uint32_t base = arg(c, 0), count = arg(c, 1), size = arg(c, 2), cmp = arg(c, 3);
         // An insertion sort through the program's comparator: the order of

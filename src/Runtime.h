@@ -53,6 +53,9 @@ private:
     uint32_t streamNumber(Cpu &cpu, uint32_t stream);   // &_ftable[n] -> 1, 2, 3
     uint32_t handlers_[32] = { 0 };
     uint32_t errno_ = 0;
+    // rand / srand: RTS6x's generator (C's own example, 7.20.2.2/5) and its state, so a program's series is
+    // the same run as an .out (RTS6x's rand) or here, and the same on any host - not the host library's
+    uint32_t randState_ = 1;
     bool closed_[3] = { false, false, false };   // close(0..2): what a closed standard stream swallows
     FILE *host(int fd) const;                    // stdout or stderr for fd 1 or 2, null once closed
     struct AtExit { uint32_t fn, arg; };

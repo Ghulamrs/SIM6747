@@ -22,7 +22,9 @@ if [ -x "$CPP11" ] && [ -x "$ASM6X" ] && [ -x "$LNK6X" ] && [ -f "$TIRTS/rts6x.l
 else echo "c6x-debug lines: skipped - cpp11, asm6x, lnk6x and rts6x.lib are not all here (CPP11, ASM6X, LNK6X, TIRTS name them)"; fi
 for t in $cases; do
     if [ "$t" = cl6x-g ]; then "$SIM6747" --run --debug cl6x-g.out < cl6x-g.commands > "$OUT/$t.got" 2>&1; st=$?
-    elif [ "$t" = lines ]; then ( cd "$OUT" && "$SIM6747" --run --debug lines.out < "$D/debug/lines.commands" ) > "$OUT/$t.got" 2>&1; st=$?
+    elif [ "$t" = lines ]; then
+        # the line table names lines.cpp bare, as cl6x does, so the source has to be beside the run
+        cp lines.cpp "$OUT/" && ( cd "$OUT" && "$SIM6747" --run --debug lines.out < "$D/debug/lines.commands" ) > "$OUT/$t.got" 2>&1; st=$?
     else "$SIM6747" --debug step.s < step.commands > "$OUT/$t.got" 2>&1; st=$?; fi
     echo "exit $st" >> "$OUT/$t.got"
     if diff "$t.expected" "$OUT/$t.got" > "$OUT/$t.diff"; then echo "c6x-debug $t: ok"; else echo "c6x-debug $t: FAILED - $OUT/$t.diff"; head -12 "$OUT/$t.diff"; fail=1; fi
