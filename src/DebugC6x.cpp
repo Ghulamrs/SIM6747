@@ -147,6 +147,38 @@ public:
             if (n.empty() || n[0] == '$' || n[0] == '.' || n.compare(0, 2, "L$") == 0 || n.compare(0, 2, "L.") == 0) continue;
             if (img_.functions.empty() ? inCode(s->first) : img_.functions.count(s->first) != 0) functions_.insert(s->first);
         }
+        // -g: each function's variables from the image's .gride.dwtag, by the address its label names
+        std::map<std::string, std::vector<dbg::Variable> > byLabel;
+        dbg::readTags(img_.dwTags, byLabel, types_);
+        for (std::map<std::string, std::vector<dbg::Variable> >::const_iterator t = byLabel.begin(); t != byLabel.end(); ++t) {
+            uint32_t at = 0;
+            if (!addressOfFunction(t->first, at)) continue;
+            variables_[at] = t->second;
+            dbg::placeBlocks(variables_[at], [this](const std::string &n, uint32_t &a) { return addressOfFunction(n, a); });
+        }
+    }
+    const dbg::TypeInfo *typeNamed(const std::string &name) const override {
+        std::map<std::string, dbg::TypeInfo>::const_iterator t = types_.find(name);
+        return t == types_.end() ? nullptr : &t->second;
+    }
+    const std::vector<dbg::Variable> *variablesAt(uint32_t entry) const override {
+        std::map<uint32_t, std::vector<dbg::Variable> >::const_iterator v = variables_.find(entry);
+        return v == variables_.end() ? nullptr : &v->second;
+    }
+    bool read(uint32_t addr, uint8_t *buf, size_t n) const override {
+        cpu_.flushStores();   // a store still in flight is part of what a halted debugger shows
+        for (size_t k = 0; k < n; k++) {
+            const uint32_t a = addr + static_cast<uint32_t>(k);
+            if (!cpu_.memory().mapped(a)) return false;
+            buf[k] = cpu_.memory().read8(a);
+        }
+        return true;
+    }
+    bool write(uint32_t addr, const uint8_t *buf, size_t n) override {
+        cpu_.flushStores();
+        for (size_t k = 0; k < n; k++) if (!cpu_.memory().mapped(addr + static_cast<uint32_t>(k))) return false;
+        for (size_t k = 0; k < n; k++) cpu_.memory().write8(addr + static_cast<uint32_t>(k), buf[k]);
+        return true;
     }
     std::string programName() const override { return path_; }
     uint32_t pc() const override { return cpu_.pc(); }
@@ -161,6 +193,7 @@ public:
                    "yet turn into a line table and LNK6x does not yet carry into an image";
         return "the image's .debug_line could not be read";
     }
+    bool startsRow(uint32_t pc) const override { return lines_ && table_.rows.count(pc) != 0; }
     bool positionAt(uint32_t pc, dbg::Position &p) const override {
         p = dbg::Position();
         if (!lines_) return inCode(pc);
@@ -223,6 +256,8 @@ private:
     LineTable table_;
     bool lines_ = false;
     std::set<uint32_t> functions_;
+    std::map<uint32_t, std::vector<dbg::Variable> > variables_;
+    std::map<std::string, dbg::TypeInfo> types_;
     std::map<std::string, std::vector<std::string> > sources_;
     bool inCode(uint32_t a) const {
         for (const Section &s : img_.sections) if (s.code && a >= s.addr && a < s.addr + s.size) return true;

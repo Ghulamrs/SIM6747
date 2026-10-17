@@ -434,7 +434,11 @@ struct Assembler {
                     if (!evaluate(u, ln, ln.operands.back(), false, v)) return false;
                     Sym s; s.section = -1; s.offset = static_cast<uint32_t>(v); s.defined = true;
                     u.locals[name] = s;
-                } else if (m == ".end" || m == ".file" || m == ".dwpsn" || m == ".clink" || m == ".nocmp" || m == ".symdepend" ||
+                } else if (m == ".dwtag" || m == ".dwendtag") {
+                    // -g: a function or one of its variables, kept as written for the debugger's Locals (Debug.cpp readTags)
+                    prog.dwTags += m + " " + ln.text + "\n";
+                } else if (m == ".end" || m == ".file" || m == ".dwpsn" || m == ".dwattr" ||
+                           m == ".clink" || m == ".nocmp" || m == ".symdepend" ||
                            m == ".compiler_opts" || m == ".retain" ||
                            m == ".ident" || m == ".p2align" || m == ".size" || m == ".type" ||
                            m == ".battr" || m == ".elfsym" || m == ".hidden" || m == ".gmember" || m == ".endgroup") {
@@ -484,6 +488,7 @@ struct Assembler {
         std::vector<uint8_t> &m = prog.memory;
         // -g: the source position cl6x's `.dwpsn file "f",line n,...` names, carried onto every instruction after it.
         std::string srcFile; int srcLine = 0;
+        bool rowStart = false;   // the next instruction begins a line-table row (a .dwpsn came before it)
         for (const Line &ln : u.lines) {
             // A function's label ends the position before it: its prologue has none until its own .dwpsn.
             if (!ln.label.empty() && ln.label[0] != '$' && ln.label[0] != '.' &&
@@ -502,6 +507,7 @@ struct Assembler {
                             srcLine = std::atoi(o.c_str() + k + 5);
                         }
                     }
+                    rowStart = true;
                     continue;
                 }
                 if (mn == ".text") sec = Text;
@@ -555,6 +561,8 @@ struct Assembler {
             in.line = ln.number;
             in.srcFile = srcFile;
             in.srcLine = srcLine;
+            in.rowStart = rowStart;
+            rowStart = false;
             if (!ln.pred.empty()) {
                 int r;
                 if (!regNumber(u, ln.pred, r)) return fail(u, ln, "bad predicate '" + ln.pred + "'");

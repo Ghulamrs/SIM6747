@@ -41,6 +41,7 @@ struct Instr {
     // The source position the last `.dwpsn` before this instruction named (-g), or line 0.
     std::string srcFile;
     int srcLine = 0;
+    bool rowStart = false;   // -g: a .dwpsn came just before this instruction - a line-table row begins here
 };
 
 struct Program {
@@ -48,6 +49,7 @@ struct Program {
     std::map<uint32_t, Instr> code;          // instructions by address
     std::map<std::string, uint32_t> symbols; // globals and whatever main needs
     std::map<uint32_t, std::string> names;   // address -> a name, for traces
+    std::string dwTags;                      // -g: the .dwtag / .dwendtag lines, for the debugger's Locals
     uint32_t textBase = 0, dataEnd = 0;
     // Symbols the assembler could not define: candidates for the runtime.
     std::map<std::string, uint32_t> natives; // name -> stub address

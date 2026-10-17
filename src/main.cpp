@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
             return 0;
         }
         if (a == "--version") {
-            std::printf("\xc2\xa9" "2026 G. R. Akhtar - SIM6747 (C6747 simulator) 1.3\n");
+            std::printf("\xc2\xa9" "2026 G. R. Akhtar - SIM6747 (C6747 simulator) 1.4\n");
             return 0;
         }
         if (isDirectory(a)) {

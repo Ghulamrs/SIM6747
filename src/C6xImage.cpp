@@ -86,6 +86,10 @@ static bool loadElf(const std::vector<uint8_t> &f, Image &img, std::string &why)
     for (unsigned i = 0; i < shnum; i++) {
         const Sh &s = sh[i];
         const uint32_t SHF_ALLOC = 2, SHF_EXEC = 4, SHT_NOBITS = 8, SHT_PROGBITS = 1;
+        // The variables' tags, not loaded either: the debugger's Locals (DebugC6x.cpp).
+        if (!(s.flags & SHF_ALLOC) && s.size != 0 && s.type == SHT_PROGBITS && uint64_t(s.off) + s.size <= f.size() &&
+            str(shstrndx, s.name) == ".gride.dwtag")
+            img.dwTags.append(f.begin() + s.off, f.begin() + s.off + s.size);
         // The line table is not loaded - it is not allocated - but a debugger reads it (DebugC6x.cpp).
         if (!(s.flags & SHF_ALLOC) && s.size != 0 && s.type == SHT_PROGBITS && uint64_t(s.off) + s.size <= f.size() &&
             str(shstrndx, s.name) == ".debug_line")

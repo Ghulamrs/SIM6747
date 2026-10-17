@@ -31,6 +31,7 @@ public:
     std::map<std::string, uint32_t> symbols;       // name -> address
     std::set<uint32_t> functions;                  // the addresses of the ELF's STT_FUNC symbols
     std::vector<uint8_t> debugLine;                // the DWARF .debug_line, when the image carries one (cl6x -g)
+    std::string dwTags;                            // .gride.dwtag: the compilers' .dwtag lines (asm6x keeps them, lnk6x carries them)
     uint32_t entry = 0;
     bool hasEntry = false;
     std::string format;                            // "elf", "coff", "ti-txt", "intel", "srec", "bin"
